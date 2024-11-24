@@ -1,5 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 
+const isJSON = (str: any) => {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 // Define a custom middleware function to convert user input
 export const userDataConvertor = (
   req: Request,
@@ -9,12 +18,7 @@ export const userDataConvertor = (
   try {
     let updatedUserInput = req.body;
     let files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-    if (req.files && Object.keys(req.files).length > 0) {
-      files = {
-        ...(req.files as { [fieldname: string]: Express.Multer.File[] }),
-      };
-
+    if (files && Object.keys(files).length > 0) {
       for (const fieldName in files) {
         if (Array.isArray(files[fieldName])) {
           // Extract filenames from badges array
@@ -42,20 +46,25 @@ export const userDataConvertor = (
     }
 
     for (const key in updatedUserInput) {
-      if (typeof updatedUserInput[key] === "string") {
-        try {
-          updatedUserInput[key] = JSON.parse(updatedUserInput[key]);
-        } catch (error) {
-          console.error(`Error parsing JSON for key ${key}:`, error);
-        }
+      if (
+        typeof updatedUserInput[key] === "string" &&
+        key !== "avatar" &&
+        isJSON(updatedUserInput[key])
+      ) {
+        updatedUserInput[key] = JSON.parse(updatedUserInput[key]);
+      }
+
+      if (key === "avatar" && Array.isArray(updatedUserInput[key])) {
+        updatedUserInput[key] = updatedUserInput[key][0];
       }
     }
 
     req.body = updatedUserInput;
     next();
   } catch (error) {
-    res.status(500).json({
-      message: `Error in data conversion middleware: ${error}`,
+    console.error("Error in data conversion middleware:", error);
+    return res.status(500).json({
+      message: `Internal server error. Please try again later.`,
     });
   }
 };

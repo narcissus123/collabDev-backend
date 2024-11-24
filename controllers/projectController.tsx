@@ -36,7 +36,7 @@ export const getProjectById = async (req: Request, res: Response) => {
         .json({ message: `Project with ID ${req.params.projectId} not found` });
     }
 
-    return res.status(200).json(project);
+    return res.status(200).json({ data: project });
   } catch (error) {
     console.error("Error fetching project by ID:", error);
     return res.status(500).json({ message: "Internal server error" });
