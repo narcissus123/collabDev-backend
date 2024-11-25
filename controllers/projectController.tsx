@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Project from "../models/projectModel";
 import dayjs from "dayjs";
+import mongoose from "mongoose";
 
 export const updateProject = async (req: Request, res: Response) => {
   try {
@@ -73,6 +74,22 @@ const getArray = (value: any) => {
   return [];
 };
 
+interface SuccessResponse {
+  status: 'success';
+  data: {
+    projects: any[];
+    total: number;
+    page: number;
+    totalPages: number;
+  };
+}
+
+interface ErrorResponse {
+  status: 'error';
+  message: string;
+  code: number;
+}
+
 export const getAllProjects = async (req: Request, res: Response) => {
   try {
     const {
@@ -140,17 +157,62 @@ export const getAllProjects = async (req: Request, res: Response) => {
     const skip = (pageNum - 1) * limitNum;
     const total = await Project.countDocuments(filter);
 
+    // If no documents found with filters
+    if (total === 0) {
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          projects: [],
+          total: 0,
+          page: pageNum,
+          totalPages: 0,
+        }
+      });
+    }
+
+    const totalPages = Math.ceil(total / limitNum);
+
+     // If page is out of bounds, return last available page
+     const adjustedPage = Math.min(pageNum, Math.max(totalPages, 1));
+     const adjustedSkip = (adjustedPage - 1) * limitNum;
+ 
+
     const projects = await Project.find(filter)
       .sort(sort)
-      .skip(skip)
+      .skip(adjustedSkip)
       .limit(limitNum);
 
-    res.status(200).json({ projects, total });
+      const response: SuccessResponse = {
+        status: 'success',
+        data: {
+          projects,
+          total,
+          page: pageNum,
+          totalPages
+        }
+      };
+    
+    return res.status(200).json(response);
   } catch (err) {
     console.error("Error retrieving projects:", err);
-    res.status(500).json({
-      message: `Unable to retrieve projects: ${err}`,
-    });
+
+    if(err instanceof mongoose.Error.ValidationError){
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid query parameters",
+        code: 400,
+        errors: Object.values(err.errors).map(e => e.message)
+      });
+    }
+
+    // Server error response
+    const errorResponse: ErrorResponse = {
+      status: 'error',
+      message: 'Internal server error while retrieving projects',
+      code: 500
+    };
+
+    return res.status(500).json(errorResponse);
   }
 };
 
