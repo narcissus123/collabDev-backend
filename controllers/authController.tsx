@@ -163,7 +163,7 @@ export const protect = async (
       token = req.headers.authorization.split(" ")[1];
 
       if (!token) {
-        res.status(401).json({
+        return res.status(401).json({
           message: `You are not logged in! Please log in to get access.`,
         });
       }
@@ -175,15 +175,19 @@ export const protect = async (
       const currentUser = await User.findById(decoded.id as string);
 
       if (!currentUser) {
-        res.status(401).json({
+        return res.status(401).json({
           message: `The user belonging to this token does no longer exist.`,
         });
       }
 
-      // Give access tO protected routes
+      // Give access to protected routes
       req.authenticatedUser = currentUser as UserType;
+      return next();
     }
-    next();
+
+    return res.status(401).json({
+      message: "You are not logged in! Please log in to get access.",
+    });
   } catch (error: unknown) {
     const err = error as Error;
     console.error("Error in protect middleware:", err);

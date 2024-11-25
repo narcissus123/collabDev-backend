@@ -10,7 +10,10 @@ export const createRequest = async (req: Request, res: Response) => {
     res.status(201).json(newRequest);
   } catch (error) {
     const err = error as Error;
-    res.status(500).send(`Unable to create new request: ${err}`);
+    console.error("Error updating user:", err);
+    return res
+      .status(500)
+      .send(`Unable to create new request. Please try again later.`);
   }
 };
 
@@ -27,13 +30,11 @@ export const getUserRequests = async (req: Request, res: Response) => {
       ],
     });
 
-    if (requestsList.length === 0) {
-      return res.status(404).send({
-        message: `No requests found for user with ID ${req.params.requestId}`,
-      });
-    }
+    return res.status(200).json({
+      data: requestsList,
+      message: requestsList.length === 0 ? "No requests found" : undefined
+    });
 
-    res.status(200).json(requestsList);
   } catch (error) {
     const err = error as Error;
     res.status(500).send(`Unable to get requests: ${err}`);
@@ -86,7 +87,10 @@ export const acceptUserRequest = async (req: Request, res: Response) => {
     });
   } catch (error) {
     const err = error as Error;
-    res.status(500).send(`Unable to update the request: ${err}`);
+    console.error("Error accepting request:", err);
+    return res
+      .status(500)
+      .send(`Unable to update the request. Please try again later.`);
   }
 };
 
@@ -106,7 +110,10 @@ export const rejectUserRequest = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Request rejected" });
   } catch (error) {
     const err = error as Error;
-    res.status(500).send(`Unable to update the request: ${err}`);
+    console.error("Error rejecting request:", err);
+    return res
+      .status(500)
+      .send(`Unable to update the request. Please try again later.`);
   }
 };
 
@@ -123,6 +130,7 @@ export const deleteUserRequest = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Request deleted successfully" });
   } catch (error) {
     const err = error as Error;
-    res.status(500).send(`Unable to delete the request: ${err}`);
+    console.error("Error deleting request:", err);
+    res.status(500).send(`Unable to delete the request.`);
   }
 };
