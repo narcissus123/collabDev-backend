@@ -17,33 +17,6 @@ export const createRequest = async (req: Request, res: Response) => {
   }
 };
 
-// export const getUserRequests = async (req: Request, res: Response) => {
-//   try {
-//     const requestsList = await Requests.find({
-//       $or: [
-//         {
-//           "contributor._id": req.params.requestId,
-//         },
-//         {
-//           "owner._id": req.params.requestId,
-//         },
-//       ],
-//     });
-
-//     if (requestsList.length === 0) {
-//       return res.status(404).send({
-//         message: `No requests found for user with ID ${req.params.requestId}`,
-//       });
-//     }
-
-//     res.status(200).json(requestsList);
-//   } catch (error) {
-//     const err = error as Error;
-//     console.error("Error retrieving user:", err);
-//     return res.status(500).send(`Unable to get requests`);
-//   }
-// };
-
 export const getUserRequests = async (req: Request, res: Response) => {
   try {
     const requestsList = await Requests.find({
@@ -57,13 +30,11 @@ export const getUserRequests = async (req: Request, res: Response) => {
       ],
     });
 
-    // if (requestsList.length === 0) {
-    // return res.status(404).send({
-    //   message: `No requests found for user with ID ${req.params.requestId}`,
-    // });
-    // }
-    return res.status(404).json({ message: "No resource found!" });
-    // res.status(200).json(requestsList);
+    return res.status(200).json({
+      data: requestsList,
+      message: requestsList.length === 0 ? "No requests found" : undefined
+    });
+
   } catch (error) {
     const err = error as Error;
     res.status(500).send(`Unable to get requests: ${err}`);
