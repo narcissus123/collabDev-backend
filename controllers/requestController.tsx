@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Requests from "../models/requestModel";
-import { ChatMessage } from "../models/chatMessageModel";
+// import { ChatMessage } from "../models/chatMessageModel";
 import Project from "../models/projectModel";
 
 export const createRequest = async (req: Request, res: Response) => {
@@ -22,19 +22,18 @@ export const getUserRequests = async (req: Request, res: Response) => {
     const requestsList = await Requests.find({
       $or: [
         {
-          "contributor._id": req.params.requestId,
+          "contributor._id": req.params.requestId
         },
         {
-          "owner._id": req.params.requestId,
-        },
-      ],
+          "owner._id": req.params.requestId
+        }
+      ]
     });
 
     return res.status(200).json({
       data: requestsList,
       message: requestsList.length === 0 ? "No requests found" : undefined
     });
-
   } catch (error) {
     const err = error as Error;
     res.status(500).send(`Unable to get requests: ${err}`);
@@ -51,7 +50,7 @@ export const acceptUserRequest = async (req: Request, res: Response) => {
 
     if (!updatedRequest) {
       return res.status(404).send({
-        message: `Request with ID ${req.params.requestId} not found`,
+        message: `Request with ID ${req.params.requestId} not found`
       });
     }
 
@@ -63,27 +62,27 @@ export const acceptUserRequest = async (req: Request, res: Response) => {
 
     if (!updatedProject) {
       return res.status(404).send({
-        message: `Project with ID ${updatedRequest.project} not found`,
+        message: `Project with ID ${updatedRequest.project} not found`
       });
     }
 
-    const initialMessage = new ChatMessage({
-      sender:
-        updatedRequest?.messageType === "invitation_request"
-          ? updatedRequest?.owner
-          : updatedRequest?.contributor,
-      receiver:
-        updatedRequest?.messageType === "invitation_request"
-          ? updatedRequest?.contributor
-          : updatedRequest?.owner,
-      message: updatedRequest?.message,
-    });
+    // const initialMessage = new ChatMessage({
+    //   sender:
+    //     updatedRequest?.messageType === "invitation_request"
+    //       ? updatedRequest?.owner
+    //       : updatedRequest?.contributor,
+    //   receiver:
+    //     updatedRequest?.messageType === "invitation_request"
+    //       ? updatedRequest?.contributor
+    //       : updatedRequest?.owner,
+    //   message: updatedRequest?.message
+    // });
 
-    const savedMessage = await initialMessage.save();
+    // const savedMessage = await initialMessage.save();
 
     res.status(200).json({
       updatedRequest,
-      updatedProject,
+      updatedProject
     });
   } catch (error) {
     const err = error as Error;
@@ -101,7 +100,7 @@ export const rejectUserRequest = async (req: Request, res: Response) => {
 
     if (!request) {
       return res.status(404).send({
-        message: `Request with ID ${requestId} not found`,
+        message: `Request with ID ${requestId} not found`
       });
     }
 
@@ -123,7 +122,7 @@ export const deleteUserRequest = async (req: Request, res: Response) => {
 
     if (!request) {
       return res.status(404).send({
-        message: `Request with ID ${req.params.requestId} not found`,
+        message: `Request with ID ${req.params.requestId} not found`
       });
     }
 

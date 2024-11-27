@@ -6,16 +6,16 @@ const techStackSchema = new mongoose.Schema(
     id: {
       type: String,
       default: uuidv4,
-      required: true,
+      required: true
     },
     label: {
       type: String,
-      required: true,
+      required: true
     },
     value: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   { _id: false }
 );
@@ -25,60 +25,60 @@ const projectSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    uniqueErrorMessage: "The project with this title already exists.",
+    uniqueErrorMessage: "The project with this title already exists."
   },
   description: {
     type: String,
-    required: true,
+    required: true
   },
   solution: {
     type: String,
-    required: true,
+    required: true
   },
   techStack: {
     type: [techStackSchema],
-    default: [],
+    default: []
   },
   owner: {
     _id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: true
     },
     name: {
       type: String,
-      required: true,
+      required: true
     },
     avatar: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   contributors: [
     {
       _id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "User"
       },
       name: String,
-      avatar: String,
-    },
+      avatar: String
+    }
   ],
   roles: [
     {
       name: {
         type: String,
-        required: true,
+        required: true
       },
       requiresCollaborator: {
         type: Boolean,
-        required: true,
-      },
-    },
+        required: true
+      }
+    }
   ],
   location: {
     type: String,
-    default: "",
+    default: ""
   },
   category: {
     type: String,
@@ -99,39 +99,39 @@ const projectSchema = new mongoose.Schema({
       "Agriculture and Food",
       "Retail and E-commerce",
       "Legal and Governance",
-      "Others",
+      "Others"
     ],
-    required: true,
+    required: true
   },
   status: {
     type: String,
     enum: ["In Progress", "Completed", "Seeking Collaborators"],
-    default: "In Progress",
+    default: "In Progress"
   },
   license: {
     type: String,
     required: true,
-    default: "MIT",
+    default: "MIT"
   },
   startDate: {
     type: Date,
     required: true,
     trim: true,
-    default: () => new Date(),
+    default: () => new Date()
   },
   dueDate: {
     type: Date,
     required: true,
     trim: true,
-    default: () => new Date(),
+    default: () => new Date()
   },
   likes: {
     type: Number,
-    default: 0,
+    default: 0
   },
   links: {
     type: [String],
-    required: true,
+    required: true
   },
   coverImage: [String],
   screenshots: [String],
@@ -139,24 +139,24 @@ const projectSchema = new mongoose.Schema({
   sitemap: [String],
   userStories: {
     type: [String],
-    required: true,
+    required: true
   },
   deliverables: {
     type: [String],
-    required: true,
+    required: true
   },
   contributionsGuidelines: String,
   dataModel: {
     type: String,
-    default: "",
+    default: ""
   },
   endpoints: [
     {
       method: String,
       path: String,
-      description: String,
-    },
-  ],
+      description: String
+    }
+  ]
 });
 
 const Project = mongoose.model("Project", projectSchema);

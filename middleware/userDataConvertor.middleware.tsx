@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-const isJSON = (str: any) => {
+const isJSON = (str: unknown) => {
   try {
     JSON.parse(str);
     return true;
@@ -17,7 +17,7 @@ export const userDataConvertor = (
 ) => {
   try {
     let updatedUserInput = req.body;
-    let files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     if (files && Object.keys(files).length > 0) {
       for (const fieldName in files) {
         if (Array.isArray(files[fieldName])) {
@@ -27,18 +27,18 @@ export const userDataConvertor = (
               return file.filename;
             }
           );
-
+        
           if (updatedUserInput[fieldName]) {
             // If updatedUserInput[fieldName] is not undefined
             updatedUserInput = {
               ...updatedUserInput,
-              [fieldName]: [...filenames, ...updatedUserInput[fieldName]],
+              [fieldName]: [...filenames, ...updatedUserInput[fieldName]]
             };
           } else {
             // If updatedUserInput[fieldName] is undefined
             updatedUserInput = {
               ...updatedUserInput,
-              [fieldName]: filenames,
+              [fieldName]: filenames
             };
           }
         }
@@ -64,7 +64,7 @@ export const userDataConvertor = (
   } catch (error) {
     console.error("Error in data conversion middleware:", error);
     return res.status(500).json({
-      message: `Internal server error. Please try again later.`,
+      message: `Internal server error. Please try again later.`
     });
   }
 };

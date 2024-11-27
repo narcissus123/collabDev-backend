@@ -14,51 +14,51 @@ const requestSchema = new mongoose.Schema(
       _id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
+        required: true
       },
       name: {
         type: String,
-        required: true,
+        required: true
       },
       avatar: {
         type: String,
-        required: true,
-      },
+        required: true
+      }
     },
     contributor: {
       _id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
+        required: true
       },
       name: {
         type: String,
-        required: true,
+        required: true
       },
       avatar: {
         type: String,
-        required: true,
-      },
+        required: true
+      }
     },
     messageType: {
       type: String,
       enum: ["invitation_request", "collaboration_request"],
-      required: true,
+      required: true
     },
     project: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
-      required: true,
+      required: true
     },
     message: {
       type: String,
-      required: true,
+      required: true
     },
     status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],
-      default: "pending",
-    },
+      default: "pending"
+    }
   },
   { timestamps: true }
 );

@@ -36,7 +36,7 @@ declare module "express" {
 
 const signToken = (id: Types.ObjectId): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET as string, {
-    expiresIn: "30d",
+    expiresIn: "30d"
   });
 };
 
@@ -48,7 +48,7 @@ const createSendToken = (user: UserType, statusCode: number, res: Response) => {
       parseInt(jwtCookieExpiresIn, 10) * 24 * 60 * 60 * 1000;
     const cookieOptions = {
       expires: new Date(Date.now() + expiresInMilliseconds),
-      httpOnly: true,
+      httpOnly: true
     };
 
     res.cookie("jwt", token, cookieOptions);
@@ -60,8 +60,8 @@ const createSendToken = (user: UserType, statusCode: number, res: Response) => {
     status: "success",
     token,
     data: {
-      userWithoutPassword,
-    },
+      userWithoutPassword
+    }
   });
 };
 
@@ -69,14 +69,14 @@ export const signup = async (req: Request, res: Response) => {
   try {
     if (!req.body.name || !req.body.email || !req.body.password) {
       return res.status(400).json({
-        message: "Please provide both email and password.",
+        message: "Please provide both email and password."
       });
     }
 
     const newUser: UserType = await User.create({
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password,
+      password: req.body.password
     });
     if (newUser.availability !== null) {
       createSendToken(newUser, 201, res);
@@ -93,7 +93,7 @@ export const login = async (req: Request, res: Response) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        message: "Please provide email and password!",
+        message: "Please provide email and password!"
       });
     }
     // Check if user exists && password is correct
@@ -164,7 +164,7 @@ export const protect = async (
 
       if (!token) {
         return res.status(401).json({
-          message: `You are not logged in! Please log in to get access.`,
+          message: `You are not logged in! Please log in to get access.`
         });
       }
 
@@ -176,7 +176,7 @@ export const protect = async (
 
       if (!currentUser) {
         return res.status(401).json({
-          message: `The user belonging to this token does no longer exist.`,
+          message: `The user belonging to this token does no longer exist.`
         });
       }
 
@@ -186,13 +186,13 @@ export const protect = async (
     }
 
     return res.status(401).json({
-      message: "You are not logged in! Please log in to get access.",
+      message: "You are not logged in! Please log in to get access."
     });
   } catch (error: unknown) {
     const err = error as Error;
     console.error("Error in protect middleware:", err);
     return res.status(500).json({
-      message: `Internal server error: ${err.message}`,
+      message: `Internal server error: ${err.message}`
     });
   }
 };

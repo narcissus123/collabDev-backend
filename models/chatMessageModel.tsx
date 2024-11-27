@@ -6,34 +6,34 @@ const chatMessageSchema = new mongoose.Schema(
       _id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
+        required: true
       },
       name: {
         type: String,
-        required: true,
+        required: true
       },
       avatar: {
         type: String,
-        required: true,
-      },
+        required: true
+      }
     },
     receiver: {
       _id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
+        required: true
       },
       name: {
         type: String,
-        required: true,
+        required: true
       },
       avatar: {
         type: String,
-        required: true,
-      },
+        required: true
+      }
     },
     message: { type: String, required: true },
-    seen: { type: Boolean, required: true, default: false },
+    seen: { type: Boolean, required: true, default: false }
   },
   { timestamps: true }
 );

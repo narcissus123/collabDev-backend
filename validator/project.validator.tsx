@@ -1,7 +1,6 @@
 import joi from "joi";
 import { ObjectSchema, CustomHelpers } from "joi";
 import Project from "../models/projectModel";
-import dayjs from "dayjs";
 
 const licenseOptions = [
   "Academic Free License v3.0",
@@ -39,7 +38,7 @@ const licenseOptions = [
   "SIL Open Font License 1.1",
   "University of Illinois/NCSA Open Source License",
   "The Unlicense",
-  "zLib License",
+  "zLib License"
 ];
 
 // Check if a project with the same title already exists
@@ -60,57 +59,57 @@ const isUniqueTitle = async (value: string, helpers: CustomHelpers) => {
 const ownerSchema = joi.object({
   _id: joi.string().required(),
   name: joi.string().required(),
-  avatar: joi.string().required(),
+  avatar: joi.string().required()
 });
 
 const contributorsSchema = joi.object({
   _id: joi.string(),
   name: joi.string(),
-  avatar: joi.string(),
+  avatar: joi.string()
 });
 
 const endpointSchema = joi.object({
   method: joi.string(),
   path: joi.string(),
-  description: joi.string(),
+  description: joi.string()
 });
 
 const rolesSchema = joi.object({
   name: joi.string(),
-  requiresCollaborator: joi.boolean(),
+  requiresCollaborator: joi.boolean()
 });
 
 const techStackSchema = joi.object({
   id: joi.string().guid({ version: "uuidv4" }),
   label: joi.string(),
-  value: joi.string(),
+  value: joi.string()
 });
 
 export const schema: ObjectSchema = joi.object({
   title: joi.string().required().custom(isUniqueTitle).messages({
     "any.required": "Title is required!!!!",
     "string.empty": "Title cannot be empty.",
-    "any.custom": "Project name must be unique.",
+    "any.custom": "Project name must be unique."
   }),
   description: joi.string().required().messages({
     "any.required": "Description is required.",
-    "string.empty": "Description cannot be empty.",
+    "string.empty": "Description cannot be empty."
   }),
   solution: joi.string().required().messages({
     "any.required": "Detailed description is required.",
-    "string.empty": "Detailed description cannot be empty.",
+    "string.empty": "Detailed description cannot be empty."
   }),
   techStack: joi.array().items(techStackSchema).required().messages({
     "any.required": "Tech stack is required.",
     "array.includesRequiredUnknowns":
-      "Tech stack must be an array of objects with id, label, and value.",
+      "Tech stack must be an array of objects with id, label, and value."
   }),
   owner: ownerSchema.required().messages({
-    "any.required": "Owner information is required.",
+    "any.required": "Owner information is required."
   }),
   contributors: joi.array().items(contributorsSchema).optional(),
   roles: joi.array().items(rolesSchema).required().messages({
-    "any.required": "Role cannot be empty.",
+    "any.required": "Role cannot be empty."
   }),
   location: joi.string().optional(),
   category: joi
@@ -136,56 +135,54 @@ export const schema: ObjectSchema = joi.object({
     )
     .required()
     .messages({
-      "any.required": "Category is required.",
+      "any.required": "Category is required."
     }),
   status: joi
     .string()
     .valid("In Progress", "Completed", "Seeking Collaborators")
     .messages({
-      "any.only": "Invalid status value.",
+      "any.only": "Invalid status value."
     }),
   license: joi
     .string()
     .valid(...licenseOptions)
     .required()
     .messages({
-      "any.required": "License is required.",
+      "any.required": "License is required."
     }),
   startDate: joi.date().required().messages({
-    "any.required": "Start date is required.",
+    "any.required": "Start date is required."
   }),
   dueDate: joi.date().allow(null),
   likes: joi.number().min(0).messages({
-    "number.min": "Likes must be a non-negative number.",
+    "number.min": "Likes must be a non-negative number."
   }),
   links: joi.array().items(joi.string()).required().messages({
     "any.required": "Links are required.",
-    "array.includesRequiredUnknowns": "Links must be an array of strings.",
+    "array.includesRequiredUnknowns": "Links must be an array of strings."
   }),
   coverImage: joi.array().items(joi.string()).messages({
-    "array.includesRequiredUnknowns":
-      "Cover image must be an array of strings.",
+    "array.includesRequiredUnknowns": "Cover image must be an array of strings."
   }),
   screenshots: joi.array().items(joi.string()).messages({
-    "array.includesRequiredUnknowns":
-      "Screenshots must be an array of strings.",
+    "array.includesRequiredUnknowns": "Screenshots must be an array of strings."
   }),
   sitemap: joi.array().items(joi.string()).required().messages({
-    "any.required": "Sitemap is required.",
+    "any.required": "Sitemap is required."
   }),
   userStories: joi.array().items(joi.string()).required().messages({
-    "any.required": "User stories are required.",
+    "any.required": "User stories are required."
   }),
   deliverables: joi.array().items(joi.string()).required().messages({
-    "any.required": "Deliverables are required.",
+    "any.required": "Deliverables are required."
   }),
   contributionsGuidelines: joi.string().allow("").optional().messages({
-    "string.empty": "Contribution guidelines must be a string.",
+    "string.empty": "Contribution guidelines must be a string."
   }),
   dataModel: joi.string().allow("").optional().messages({
-    "string.empty": "Data model must be a string!!.",
+    "string.empty": "Data model must be a string!!."
   }),
   endpoints: joi.array().items(endpointSchema).optional().messages({
-    "array.includesRequiredUnknowns": "Endpoints must be an array of strings.",
-  }),
+    "array.includesRequiredUnknowns": "Endpoints must be an array of strings."
+  })
 });

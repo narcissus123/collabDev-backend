@@ -7,7 +7,7 @@ import { projectsValidator } from "../middleware/validateProject.middleware";
 
 const uploadProjectImages = upload.fields([
   { name: "coverImage", maxCount: 1 },
-  { name: "screenshots", maxCount: 12 },
+  { name: "screenshots", maxCount: 12 }
 ]);
 const router: Router = Router();
 router
