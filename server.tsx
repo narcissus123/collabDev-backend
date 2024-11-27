@@ -10,7 +10,7 @@ mongoose
   .connect(
     process.env.DATABASE as string,
     {
-      useNewUrlParser: true,
+      useNewUrlParser: true
     } as ConnectOptions
   )
   .then(() => {
@@ -32,9 +32,13 @@ const io = new Server(server, {
     origin:
       process.env.NODE_ENV === "production"
         ? false
-        : ["http://localhost:3000", "http://127.0.0.1:3000"],
-  },
+        : ["http://localhost:3000", "http://127.0.0.1:3000"]
+  }
 });
+
+const getChatRoom = (senderId: string, receiverId: string) => {
+  return [senderId, receiverId].sort().join("-");
+};
 
 const userSocketMap = new Map();
 
@@ -63,7 +67,7 @@ io.on("connection", (socket) => {
       const newMessage = new ChatMessage({
         sender: message.sender,
         receiver: message.receiver,
-        message: message.message,
+        message: message.message
       });
       await newMessage.save();
 
@@ -92,10 +96,10 @@ io.on("connection", (socket) => {
         {
           "receiver._id": receiverId,
           "sender._id": senderId,
-          seen: false,
+          seen: false
         },
         {
-          $set: { seen: true },
+          $set: { seen: true }
         },
         { new: true }
       );
@@ -150,7 +154,3 @@ io.on("connection", (socket) => {
     }
   });
 });
-
-const getChatRoom = (senderId: string, receiverId: string) => {
-  return [senderId, receiverId].sort().join("-");
-};

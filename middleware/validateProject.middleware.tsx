@@ -14,7 +14,7 @@ export const projectsValidator = (
       (error: { message: unknown }) => error.message
     );
     return res.status(400).json({
-      error: errorMessages,
+      error: errorMessages
     });
   }
 
