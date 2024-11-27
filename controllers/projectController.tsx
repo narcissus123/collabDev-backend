@@ -9,20 +9,20 @@ export const updateProject = async (req: Request, res: Response) => {
       req.params.projectId,
       req.body,
       {
-        new: true,
+        new: true
       }
     );
 
     if (!updatedProject) {
       return res.status(404).send({
-        message: `Project with ID ${req.params.projectId} not found`,
+        message: `Project with ID ${req.params.projectId} not found`
       });
     }
 
     res.status(200).json(updatedProject);
   } catch (error) {
     res.status(500).json({
-      message: `Unable to update project with ID ${req.params.projectId}: ${error}`,
+      message: `Unable to update project with ID ${req.params.projectId}: ${error}`
     });
   }
 };
@@ -67,7 +67,7 @@ interface ProjectFilter {
   location?: { $regex: string; $options: string };
 }
 
-const getArray = (value: any) => {
+const getArray = (value: unknown) => {
   if (typeof value === "string")
     return value?.split(",").map((item) => item.trim());
   if (Array.isArray(value) && value.length > 0) return value;
@@ -75,9 +75,9 @@ const getArray = (value: any) => {
 };
 
 interface SuccessResponse {
-  status: 'success';
+  status: "success";
   data: {
-    projects: any[];
+    projects: unknown[];
     total: number;
     page: number;
     totalPages: number;
@@ -85,7 +85,7 @@ interface SuccessResponse {
 }
 
 interface ErrorResponse {
-  status: 'error';
+  status: "error";
   message: string;
   code: number;
 }
@@ -103,10 +103,10 @@ export const getAllProjects = async (req: Request, res: Response) => {
       sortBy,
       sortOrder,
       page = 1,
-      limit = 10,
+      limit = 10
     } = req.query;
 
-    let filter: ProjectFilter = {};
+    const filter: ProjectFilter = {};
 
     const categories: string[] = getArray(category);
     if (categories.length !== 0) {
@@ -131,7 +131,7 @@ export const getAllProjects = async (req: Request, res: Response) => {
       filter.startDate = {
         $gte: dayjs(startDate as string)
           .startOf("day")
-          .toDate(),
+          .toDate()
       };
     }
 
@@ -139,7 +139,7 @@ export const getAllProjects = async (req: Request, res: Response) => {
       filter.dueDate = {
         $lte: dayjs(dueDate as string)
           .endOf("day")
-          .toDate(),
+          .toDate()
       };
     }
 
@@ -147,68 +147,67 @@ export const getAllProjects = async (req: Request, res: Response) => {
       filter.location = { $regex: location as string, $options: "i" };
     }
 
-    let sort: { [key: string]: any } = {};
+    const sort: { [key: string]: unknown } = {};
     if (sortBy) {
       sort[sortBy as string] = sortOrder === "desc" ? -1 : 1;
     }
 
     const pageNum = parseInt(page as string) || 1;
     const limitNum = parseInt(limit as string) || 10;
-    const skip = (pageNum - 1) * limitNum;
+    // const skip = (pageNum - 1) * limitNum;
     const total = await Project.countDocuments(filter);
 
     // If no documents found with filters
     if (total === 0) {
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           projects: [],
           total: 0,
           page: pageNum,
-          totalPages: 0,
+          totalPages: 0
         }
       });
     }
 
     const totalPages = Math.ceil(total / limitNum);
 
-     // If page is out of bounds, return last available page
-     const adjustedPage = Math.min(pageNum, Math.max(totalPages, 1));
-     const adjustedSkip = (adjustedPage - 1) * limitNum;
- 
+    // If page is out of bounds, return last available page
+    const adjustedPage = Math.min(pageNum, Math.max(totalPages, 1));
+    const adjustedSkip = (adjustedPage - 1) * limitNum;
 
     const projects = await Project.find(filter)
       .sort(sort)
       .skip(adjustedSkip)
       .limit(limitNum);
 
-      const response: SuccessResponse = {
-        status: 'success',
-        data: {
-          projects,
-          total,
-          page: pageNum,
-          totalPages
-        }
-      };
-    
+    const response: SuccessResponse = {
+      status: "success",
+      data: {
+        projects,
+        total,
+        page: pageNum,
+        totalPages
+      }
+    };
+
     return res.status(200).json(response);
   } catch (err) {
     console.error("Error retrieving projects:", err);
 
-    if(err instanceof mongoose.Error.ValidationError){
+    if (err instanceof mongoose.Error.ValidationError) {
       return res.status(400).json({
         status: "error",
         message: "Invalid query parameters",
         code: 400,
-        errors: Object.values(err.errors).map(e => e.message)
+        errors: Object.values(err.errors).map((e) => e.message)
       });
     }
 
     // Server error response
     const errorResponse: ErrorResponse = {
-      status: 'error',
-      message: 'Internal server error while retrieving projects',
+      status: "error",
+      message: "Internal server error while retrieving projects",
       code: 500
     };
 
