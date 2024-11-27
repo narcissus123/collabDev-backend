@@ -17,12 +17,9 @@ export const userDataConvertor = (
 ) => {
   try {
     let updatedUserInput = req.body;
-    console.log("updatedUserInput", updatedUserInput);
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-    console.log("files", files);
     if (files && Object.keys(files).length > 0) {
       for (const fieldName in files) {
-        // console.log("fieldName", fieldName);
         if (Array.isArray(files[fieldName])) {
           // Extract filenames from badges array
           const filenames: string[] = files[fieldName].map(
@@ -30,21 +27,19 @@ export const userDataConvertor = (
               return file.filename;
             }
           );
-          // console.log("filenames", filenames);
+        
           if (updatedUserInput[fieldName]) {
             // If updatedUserInput[fieldName] is not undefined
             updatedUserInput = {
               ...updatedUserInput,
               [fieldName]: [...filenames, ...updatedUserInput[fieldName]]
             };
-            // console.log("updatedUserInput1", updatedUserInput);
           } else {
             // If updatedUserInput[fieldName] is undefined
             updatedUserInput = {
               ...updatedUserInput,
               [fieldName]: filenames
             };
-            console.log("updatedUserInput2", updatedUserInput);
           }
         }
       }
@@ -57,16 +52,13 @@ export const userDataConvertor = (
         isJSON(updatedUserInput[key])
       ) {
         updatedUserInput[key] = JSON.parse(updatedUserInput[key]);
-        // console.log("key", key);
-        // console.log("updatedUserInput-------", updatedUserInput);
-        // console.log("updatedUserInput[key]", updatedUserInput[key]);
       }
 
       if (key === "avatar" && Array.isArray(updatedUserInput[key])) {
         updatedUserInput[key] = updatedUserInput[key][0];
       }
     }
-    // console.log("updatedUserInput last", updatedUserInput);
+
     req.body = updatedUserInput;
     next();
   } catch (error) {
