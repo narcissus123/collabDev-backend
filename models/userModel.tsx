@@ -6,75 +6,79 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: true
     },
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     password: {
       type: String,
       required: true,
       minlength: 8,
-      select: false,
+      select: false
     },
     avatar: {
       type: String,
-      default: "",
+      default: ""
     },
     bio: {
       type: String,
-      default: "",
+      default: ""
     },
     about: {
       type: String,
-      default: "",
+      default: ""
     },
     role: {
       type: String,
       enum: ["admin", "user"],
-      default: "user",
+      default: "user"
     },
     socialMedia: [{ platform: String, url: String }],
     preferredContact: {
       type: String,
-      default: "",
+      default: ""
     },
     skills: {
       type: [String],
-      default: [],
+      default: []
     },
     languages: {
       type: [String],
-      default: [],
+      default: []
     },
     badges: {
       type: [String],
-      default: [],
+      default: []
     },
     availability: {
       status: {
         type: String,
         enum: ["Available", "Partially Available", "Unavailable"],
-        default: "Available",
+        default: "Available"
       },
       hoursPerDay: {
         type: Number,
-        default: 0,
+        default: 0
       },
       daysPerWeek: {
         type: Number,
-        default: 0,
-      },
+        default: 0
+      }
     },
     passions: {
       type: [String],
-      default: [],
+      default: []
     },
+    resume: {
+      fileKey: String,
+      lastUpdated: Date
+    }
   },
   {
-    timestamps: true,
+    timestamps: true
   }
 );
 
