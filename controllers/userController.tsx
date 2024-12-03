@@ -1,22 +1,122 @@
 import { Request, Response } from "express";
 import User from "../models/userModel";
-import {
-  deleteFromS3,
-  getPresignedUrl
-} from "../middleware/s3Upload.middleware";
+import { deleteFromS3 } from "../middleware/s3Upload.middleware";
+import Project from "../models/projectModel";
+import Requests from "../models/requestModel";
+import { ChatMessage } from "../models/chatMessageModel";
 
 export const UpdateUser = async (req: Request, res: Response) => {
   try {
     const userId = req.authenticatedUser?.id;
-    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+
+    // Delete old resume if exists
+    const user = await User.findById(userId);
+
+    if (!userId || userId !== req.params.userId) {
+      return res.status(400).json({
+        status: 'error',
+        message: !userId ? "User not found. Please check the ID and try again." : "Unauthorized access."
+      });
+    }
+
+    if (user?.resume && req.body.resume !== undefined && req.body.resume !== user.resume) {
+      try {
+        await deleteFromS3(user.resume);
+      } catch (deleteError) {
+        console.error("Error deleting old resume:", deleteError);
+      }
+    }
+
+    if (user?.avatar && req.body.avatar !== undefined && req.body.avatar !== user.avatar) {
+      try {
+        await deleteFromS3(user.avatar);
+      } catch (deleteError) {
+        console.error("Error deleting old avatar:", deleteError);
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, { $set: req.body }, {
       new: true
     });
 
-    if (!updatedUser) {
-      return res.status(404).send({
-        message: `User not found. Please check the ID and try again.`
-      });
+    // Update all projects where this user is an owner
+    if (req.body.name || req.body.avatar) {
+      const updateData = {
+        name: req.body.name || user?.name,
+        avatar: req.body.avatar || user?.avatar
+      };
+
+       // Update Projects
+       await Promise.all([
+        // Update projects where user is owner
+        Project.updateMany(
+          { "owner._id": userId },
+          { 
+            $set: { 
+              "owner.name": updateData.name,
+              "owner.avatar": updateData.avatar
+            } 
+          }
+        ),
+
+        // Update projects where user is contributor
+        Project.updateMany(
+          { "contributors._id": userId },
+          { 
+            $set: { 
+              "contributors.$.name": updateData.name,
+              "contributors.$.avatar": updateData.avatar
+            } 
+          }
+        ),
+
+        // Update ChatMessages where user is sender
+        ChatMessage.updateMany(
+          { "sender._id": userId },
+          {
+            $set: {
+              "sender.name": updateData.name,
+              "sender.avatar": updateData.avatar
+            }
+          }
+        ),
+
+        // Update ChatMessages where user is receiver
+        ChatMessage.updateMany(
+          { "receiver._id": userId },
+          {
+            $set: {
+              "receiver.name": updateData.name,
+              "receiver.avatar": updateData.avatar
+            }
+          }
+        ),
+
+        // Update Requests where user is owner
+        Requests.updateMany(
+          { "owner._id": userId },
+          {
+            $set: {
+              "owner.name": updateData.name,
+              "owner.avatar": updateData.avatar
+            }
+          }
+        ),
+
+        // Update Requests where user is contributor
+        Requests.updateMany(
+          { "contributor._id": userId },
+          {
+            $set: {
+              "contributor.name": updateData.name,
+              "contributor.avatar": updateData.avatar
+            }
+          }
+        )
+      ]);
     }
+    
+
 
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -65,149 +165,5 @@ export const getUserById = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ message: "Unable to retrieve user information." });
-  }
-};
-
-export const uploadResume = async (req: Request, res: Response) => {
-  try {
-    const userId = req.authenticatedUser?.id;
-    const file = req.file as Express.MulterS3.File; 
-    
-    // Validation checks
-    if (!file) {
-      return res.status(400).json({
-        status: 'error',
-        message: "No file uploaded"
-      });
-    }
-
-    if (!userId) {
-      return res.status(401).json({
-        status: 'error',
-        message: "User not authenticated"
-      });
-    }
-
-    // Check if user owns this profile
-    if (userId !== req.params.userId) {
-      return res.status(403).json({
-        status: 'error',
-        message: "You can only upload resume to your own profile"
-      });
-    }
-
-    // Delete old resume if exists
-    const user = await User.findById(userId);
-    if (user?.resume?.fileKey) {
-      try {
-        await deleteFromS3(user.resume.fileKey);
-      } catch (deleteError) {
-        console.error("Error deleting old resume:", deleteError);
-        // Continue with upload even if delete fails
-      }
-    }
-
-    const fileKey = file.key;
-    const fileUrl = file.location; // S3 URL of the uploaded file
-
-    // Update user record
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        resume: {
-          fileKey,
-          lastUpdated: new Date()
-        }
-      },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({
-        status: 'error',
-        message: "User not found"
-      });
-    }
-
-    res.status(200).json({
-      status: 'success',
-      message: "Resume uploaded successfully",
-      data: {
-        user: updatedUser,
-        resumeUrl: fileUrl
-      }
-    });
-
-  } catch (error) {
-    console.error("Error uploading resume:", error);
-    res.status(500).json({
-      status: 'error',
-      message: "Unable to upload resume. Please try again later.",
-      error: process.env.NODE_ENV === 'development' ? error : undefined
-    });
-  }
-};
-
-export const getResumeUrl = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
-    const user = await User.findById(userId);
-
-    if (!user?.resume?.fileKey) {
-      return res.status(404).json({
-        message: "No resume found"
-      });
-    }
-
-    const presignedUrl = await getPresignedUrl(user.resume.fileKey);
-
-    res.status(200).json({
-      resumeUrl: presignedUrl
-    });
-  } catch (error) {
-    console.error("Error getting resume URL:", error);
-    res.status(500).json({
-      message: "Unable to get resume URL. Please try again later."
-    });
-  }
-};
-
-export const deleteResume = async (req: Request, res: Response) => {
-  try {
-    const userId = req.authenticatedUser?.id;
-
-    // Check if user owns this profile
-    if (userId !== req.params.userId) {
-      return res.status(403).json({
-        message: "You can only delete resume from your own profile"
-      });
-    }
-
-    const user = await User.findById(userId);
-    if (!user?.resume?.fileKey) {
-      return res.status(404).json({
-        message: "No resume found"
-      });
-    }
-
-    // Delete from S3
-    await deleteFromS3(user.resume.fileKey);
-
-    // Update user record
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { resume: null },
-      { new: true }
-    );
-
-    res.status(200).json({
-      message: "Resume deleted successfully",
-      user: updatedUser
-    });
-  } catch (error) {
-    console.error("Error deleting resume:", error);
-    res.status(500).json({
-      message: "Unable to delete resume. Please try again later."
-    });
   }
 };
