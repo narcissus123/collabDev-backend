@@ -6,6 +6,7 @@ export interface IContribution extends Document {
   projectId: Types.ObjectId;
   name: string;
   avatar: string;
+  deletedFor: Types.ObjectId[];
 }
 
 const requestSchema = new mongoose.Schema(
@@ -58,7 +59,11 @@ const requestSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "accepted", "rejected"],
       default: "pending"
-    }
+    },
+    deletedFor: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }]
   },
   { timestamps: true }
 );
