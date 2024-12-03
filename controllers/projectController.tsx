@@ -67,6 +67,37 @@ interface ProjectFilter {
   location?: { $regex: string; $options: string };
 }
 
+export const addCollaborator = async (req: Request, res: Response) => {
+  try {
+    const { projectId, collaboratorId } = req.params;
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    // Verify the requester is the project owner
+    if(project?.owner && (project?.owner._id.toString() !== req.authenticatedUser?.id.toString())){
+      return res.status(403).json({ message: "Not authorized to add collaborators" });
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(
+      projectId,
+      { $addToSet: { contributors: collaboratorId } },
+      { new: true }
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: updatedProject
+    });
+  } catch (error) {
+    const err = error as Error;
+    console.error("Error adding collaborator:", err);
+    return res.status(500).send("Unable to add collaborator. Please try again later.");
+  }
+};
+
 const getArray = (value: unknown) => {
   if (typeof value === "string")
     return value?.split(",").map((item) => item.trim());
@@ -154,7 +185,6 @@ export const getAllProjects = async (req: Request, res: Response) => {
 
     const pageNum = parseInt(page as string) || 1;
     const limitNum = parseInt(limit as string) || 10;
-    // const skip = (pageNum - 1) * limitNum;
     const total = await Project.countDocuments(filter);
 
     // If no documents found with filters
@@ -222,5 +252,44 @@ export const getProjectsByOwnerId = async (req: Request, res: Response) => {
     res.status(200).json(projects);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const deleteProject = async (req: Request, res: Response) => {
+  try {
+    const { projectId } = req.params;
+    
+    // Find the project and check if it exists
+    const project = await Project.findById(projectId);
+    
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+     // Verify the requester is the project owner
+     if(project?.owner && (project?.owner._id.toString() !== req.authenticatedUser?.id.toString())){
+      return res.status(403).json({ message: "You don't have permission to delete this project" });
+    }
+
+    // Check if the project has any contributors
+    if (project.contributors && project.contributors.length > 0) {
+      return res.status(400).json({ 
+        error: "Cannot delete project with active contributors." 
+      });
+    }
+
+    // Delete the project
+    await Project.findByIdAndDelete(projectId);
+    
+    res.status(200).json({ 
+      message: "Project successfully deleted",
+      projectId
+    });
+
+  } catch (error) {
+    console.error('Error in deleteProject:', error);
+    res.status(500).json({ 
+      error: "Failed to delete project. Please try again later." 
+    });
   }
 };
