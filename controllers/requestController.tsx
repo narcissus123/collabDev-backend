@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Requests from "../models/requestModel";
-// import { ChatMessage } from "../models/chatMessageModel";
-import Project from "../models/projectModel";
+import { ChatMessage } from "../models/chatMessageModel";
+import mongoose from "mongoose";
 
 export const createRequest = async (req: Request, res: Response) => {
   try {
@@ -19,15 +19,25 @@ export const createRequest = async (req: Request, res: Response) => {
 
 export const getUserRequests = async (req: Request, res: Response) => {
   try {
+    if(req.params.userId !== req.authenticatedUser?.id){
+      return res.status(403).json({ message: "Not authorized to access user requests." });
+    }
+
     const requestsList = await Requests.find({
-      $or: [
+      $and: [
         {
-          "contributor._id": req.params.requestId
+          $or: [
+            {
+              "contributor._id": req.params.userId
+            },
+            {
+              "owner._id": req.params.userId
+            }
+          ]
         },
-        {
-          "owner._id": req.params.requestId
-        }
+        {deletedFor: {$ne: req.params.userId}}
       ]
+      
     });
 
     return res.status(200).json({
@@ -41,50 +51,82 @@ export const getUserRequests = async (req: Request, res: Response) => {
 };
 
 export const acceptUserRequest = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+    session.startTransaction();
+
   try {
+    // Verify the request exists and get current state
+    const existingRequest = await Requests.findById(req.params.requestId);
+        
+    if (!existingRequest) {
+      await session.abortTransaction();
+      return res.status(404).json({
+        message: `Request with ID ${req.params.requestId} not found`
+      });
+    }
+
+    // Verify the recipient is accepting the request
+    if( existingRequest.contributor && existingRequest.owner) {
+      const isRecipient = 
+        (existingRequest.messageType === "invitation_request" && 
+          existingRequest.contributor._id.toString() === req.authenticatedUser?.id) ||
+        (existingRequest.messageType === "collaboration_request" && 
+          existingRequest.owner._id.toString() === req.authenticatedUser?.id);
+
+      if (!isRecipient) {
+        await session.abortTransaction();
+        return res.status(403).json({
+          message: "Only the request recipient can accept this request"
+        });
+      }
+    }
+   
+    // Check if request is in acceptable state
+    if (existingRequest.status !== "pending") {
+      await session.abortTransaction();
+      return res.status(400).json({
+        message: `Request cannot be accepted because it is ${existingRequest.status}`
+      });
+    }
+
     const updatedRequest = await Requests.findByIdAndUpdate(
       req.params.requestId,
-      req.body,
-      { new: true }
+      { status: "accepted" },
+      { new: true, session }
     );
 
     if (!updatedRequest) {
+      await session.abortTransaction();
       return res.status(404).send({
         message: `Request with ID ${req.params.requestId} not found`
       });
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(
-      updatedRequest.project,
-      { $addToSet: { contributors: updatedRequest.contributor } },
-      { new: true }
-    );
+    const initialMessage = new ChatMessage({
+      sender:
+        updatedRequest?.messageType === "invitation_request"
+          ? updatedRequest?.owner
+          : updatedRequest?.contributor,
+      receiver:
+        updatedRequest?.messageType === "invitation_request"
+          ? updatedRequest?.contributor
+          : updatedRequest?.owner,
+      message: updatedRequest?.message,
+      seen: false
+    });
 
-    if (!updatedProject) {
-      return res.status(404).send({
-        message: `Project with ID ${updatedRequest.project} not found`
-      });
-    }
-
-    // const initialMessage = new ChatMessage({
-    //   sender:
-    //     updatedRequest?.messageType === "invitation_request"
-    //       ? updatedRequest?.owner
-    //       : updatedRequest?.contributor,
-    //   receiver:
-    //     updatedRequest?.messageType === "invitation_request"
-    //       ? updatedRequest?.contributor
-    //       : updatedRequest?.owner,
-    //   message: updatedRequest?.message
-    // });
-
-    // const savedMessage = await initialMessage.save();
+    await initialMessage.save({ session });
+    await session.commitTransaction();
 
     res.status(200).json({
-      updatedRequest,
-      updatedProject
-    });
+        status: "success",
+        data: {
+          request: updatedRequest,
+          chatInitiated: true
+        }
+      });
   } catch (error) {
+    await session.abortTransaction();
     const err = error as Error;
     console.error("Error accepting request:", err);
     return res
@@ -95,18 +137,49 @@ export const acceptUserRequest = async (req: Request, res: Response) => {
 
 export const rejectUserRequest = async (req: Request, res: Response) => {
   try {
-    const { requestId } = req.body;
-    const request = await Requests.findById(requestId);
-
-    if (!request) {
-      return res.status(404).send({
-        message: `Request with ID ${requestId} not found`
+    // Verify the request exists and get current state
+    const existingRequest = await Requests.findById(req.params.requestId);
+    
+    if (!existingRequest) {
+      return res.status(404).json({
+        message: `Request with ID ${req.params.requestId} not found`
       });
     }
 
-    await Requests.findByIdAndDelete(requestId);
+    // Verify the user is authorized to reject this request.
+    if( existingRequest.contributor && existingRequest.owner) {
+      const isAuthorizedToReject = 
+      (existingRequest.messageType === "invitation_request" && 
+       existingRequest.contributor._id.toString() === req.authenticatedUser?.id) ||
+      (existingRequest.messageType === "collaboration_request" && 
+       existingRequest.owner._id.toString() === req.authenticatedUser?.id);
 
-    res.status(200).json({ message: "Request rejected" });
+    if (!isAuthorizedToReject) {
+      return res.status(403).json({
+        message: "Not authorized to reject this request"
+      });
+    }
+    }
+
+    // Check if request is in rejectable state
+    if (existingRequest.status !== "pending") {
+      return res.status(400).json({
+        message: `Request cannot be rejected because it is ${existingRequest.status}`
+      });
+    }
+
+    // Update request status
+    const updatedRequest = await Requests.findByIdAndUpdate(
+      req.params.requestId,
+      { status: "rejected" },
+      { new: true }
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: updatedRequest
+    });
+    
   } catch (error) {
     const err = error as Error;
     console.error("Error rejecting request:", err);
@@ -118,12 +191,21 @@ export const rejectUserRequest = async (req: Request, res: Response) => {
 
 export const deleteUserRequest = async (req: Request, res: Response) => {
   try {
-    const request = await Requests.findByIdAndDelete(req.params.requestId);
+    const request = await Requests.findByIdAndUpdate(
+      req.params.requestId,
+      { $addToSet: { deletedFor: req.authenticatedUser?.id } },
+      { new: true } 
+    );
 
     if (!request) {
       return res.status(404).send({
         message: `Request with ID ${req.params.requestId} not found`
       });
+    }
+
+    // If both parties have deleted, remove from DB
+    if (request.deletedFor.length === 2) {
+      await Requests.findByIdAndDelete(req.params.requestId);
     }
 
     res.status(200).json({ message: "Request deleted successfully" });
