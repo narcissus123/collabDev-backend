@@ -3,6 +3,7 @@ import helmet from "helmet";
 import cors from "cors";
 import authRouter from "./routes/authRoute";
 import userRouter from "./routes/userRoute";
+import fileUploadRouter from "./routes/fileUploadRouter";
 import projectRouter from "./routes/projectRoute";
 import requestRouter from "./routes/requestRoute";
 import chatMessageRouter from "./routes/chatMessageRoute";
@@ -28,6 +29,7 @@ app.use("/public/userProfileImages/", express.static(userProfileImagesPath));
 
 app.use("/api/v1/auth/", authRouter);
 app.use("/api/v1/user/", userRouter);
+app.use("/api/v1/files/", fileUploadRouter);
 app.use("/api/v1/project/", projectRouter);
 app.use("/api/v1/request/", requestRouter);
 app.use("/api/v1/chatMessage/", chatMessageRouter);

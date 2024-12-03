@@ -73,8 +73,8 @@ const userSchema = new mongoose.Schema(
       default: []
     },
     resume: {
-      fileKey: String,
-      lastUpdated: Date
+      type: String,
+      default: ""
     }
   },
   {

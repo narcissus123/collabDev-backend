@@ -29,6 +29,15 @@ router
     uploadProjectImages,
     userDataConvertor,
     projectController.updateProject
+  ).delete(
+    authController.protect,
+    projectController.deleteProject
+  );
+
+  router.post(
+    '/:projectId/collaborators/:collaboratorId',
+    authController.protect,
+    projectController.addCollaborator
   );
 
 router.route("/owner/:ownerId").get(projectController.getProjectsByOwnerId);
