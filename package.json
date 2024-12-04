@@ -4,8 +4,13 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
-    "start": "nodemon --exec tsx server.tsx",
+    "start": "tsx server.tsx",
+    "dev": "nodemon --exec tsx server.tsx",
+    "build": "tsc",
     "lint": "eslint . --fix"
   },
   "keywords": [],

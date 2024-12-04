@@ -1,86 +1,113 @@
-# Project Title
+# CollabDev 🤝
 
-CollabDev: Collaborative Developer Projects Platform (Backend)
+[![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue.svg)](https://www.typescriptlang.org/)
+[![Express](https://img.shields.io/badge/Express-4.18.2-green.svg)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-5.0.0-green.svg)](https://www.mongodb.com/)
+[![Socket.IO](https://img.shields.io/badge/Socket.IO-4.6.1-black.svg)](https://socket.io/)
 
-## Table of Contents
+CollabDev is an innovative platform that transforms how developers connect and collaborate on projects. Whether you're passionate about coding and want to join exciting projects, or you're looking for talented developers to bring your ideas to life, CollabDev provides the perfect environment for meaningful collaboration. Our platform emphasizes real-world project experience and genuine connections in the development community.
 
-1. [Project Features](#project-features)
-2. [Overview](#overview)
-3. [Problem](#problem)
-4. [Features](#features)
-5. [Nice-to-Haves](#nice-to-haves)
-6. [Tech Stack](#tech-stack)
-7. [Installation](#installation)
+## 🌟 Why CollabDev?
 
-## Overview
+Finding the right project or collaborator can be challenging in the vast developer landscape. CollabDev solves this by providing:
 
-CollabDev is a platform designed to facilitate collaboration among developers on real-world projects. It serves as a meeting point where developers can bring their projects and seek collaborators or explore projects based on their interests and skills. The platform includes essential features like user profile management, project browsing, and real-time chat functionality to support effective collaboration. Future enhancements, such as AI-driven matchmaking, are planned to further personalize and streamline the collaboration process, providing both experienced developers and newcomers with meaningful opportunities for growth and development. The backend of CollabDev provides the server-side functionality, including API endpoints, database management, and real-time communication handling.
+- **Meaningful Connections**: Connect with developers who share your interests and complement your skills
+- **Real Projects**: Work on actual projects rather than just coding exercises
+- **Streamlined Collaboration**: Built-in tools for project discovery and team communication
+- **Growth Opportunities**: Perfect for both experienced developers and newcomers looking to gain hands-on experience and enjoy collaborative development
 
-## Problem
+## 🚀 Key Features
 
-The developer community often faces challenges in finding suitable projects to work on or collaborators with compatible skill sets and interests. Traditional coding practice platforms may not fully address the need for meaningful collaboration and practical project experience. CollabDev aims to bridge this gap by providing a comprehensive solution tailored specifically for collaborative project development.
+### Project Discovery & Management
+- Advanced filtering capabilities
+- Detailed project profiles with tech stack, goals, requirements, ...
+- Project browsing with sorting and pagination
+- Like projects to show interest and support
+- Interactive Home Page (Coming Soon)
+- Project settings page for managing collaborators, project ownership, and project lifecycle  (coming soon)
+- Progress tracking dashboard (Coming)
 
-## Features
+### Collaboration Tools
+- Real-time chat functionality
+- Structured collaboration requests system
+- Personalized invitation messages
+- Enhanced chat features - search, reply, presence status (Coming)
+- Team coordination tools (Coming)
 
-- Account Management:
-  - Integrate authentication using JWT, authorization, and security mechanisms like encryption.
-- Project Browsing / Interaction:
-  - Implement a feature-rich REST API to handle project browsing, sorting, filtering, and pagination.
-  - View detailed project information, including description, goals, tech stack, and collaborators.
-  - Employ a multi-step form for streamlined creation of new projects.
-  - Like projects to show interest and support.
-- Collaboration Requests:
-  - Implement endpoints for creating, accepting, rejecting, and deleting collaboration / invitation requests, including personalized messages and user authentication.
-  - Manage requests with MongoDB, updating related project and user data, and initializing chat upon acceptance.
-- Real-time Communication:
-  - Establish a Socket.io server with user registration, room management, and real-time messaging capabilities.
-  - Implement message persistence, status updates, and deletion using MongoDB and Mongoose.
+### Professional Profiles
+- Skill showcase
+- Project portfolio
+- Customizable user profiles
+- Profile image storage using AWS S3
+- User search functionality (Coming Soon)
+- AI-powered skill matching (Coming)
 
-## Nice-to-haves
+### Security & Authentication
+- JWT-based authentication
+- Role-based access control
+- Secure data handling
+- Passwordless authentication using Okta (Coming Soon)
 
--	Passwordless authentication using Okta 
--	User search feature 
--	Firebase integration for saving files and images.
--	Enhanced chat functionality with search, reply, and presence status 
--	Using OpenAI's API for matchmaking based on user and project information.
--	Gamification elements and a points system based on user performance
 
- ## Tech Stack
- 
--	Backend: Express
--	Database: MongoDB with Mongoose
--	Language: TypeScript
--	Linting: ESLint
--	Real-time Communication: Socket.io
+_This is just the beginning - many more features are in our development pipeline!_
 
-## Installation
 
-To run CollabDev locally, follow these steps:
-1.  Clone the repository:
 
+## 🛠 Technology Stack
+
+### Backend
+- **Framework**: Express.js with TypeScript
+- **Database**: MongoDB with Mongoose
+- **Real-time Communication**: Socket.IO
+- **Authentication**: JWT
+- **Cloud Storage**: AWS S3
+- **API Documentation**: Swagger/OpenAPI
+
+### Development Tools
+- **Language**: TypeScript
+- **Code Quality**: ESLint
+- **Development Server**: Nodemon
+
+
+## 🚦 Getting Started
+
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB
+- npm/yarn
+- AWS Account (for S3 storage)
+
+### Installation
+
+1. Clone the repository
 ```bash
 git clone https://github.com/narcissus123/collabDev-backend.git
+cd collabDev-backend
 ```
 
-2. Install dependencies:
-
+2. Install dependencies
 ```bash
 npm install
 ```
-   
-3. Set up environment variables:  
 
-  -	Create a `.env` file in the root directory and add the necessary environment variables (e.g., MongoDB URI, JWT secret). Please refer to `.env-sample` for an example setup.
+3. Configure environment variables
+```bash
+cp .env.example .env
+# Edit .env with your configurations
+```
 
-4. Run the project:
-   
+4. Start development server
 ```bash
 npm run dev
 ```
 
-## Links:
+## 🔗 Links
 
-- GitHub repository - Backend: [https://github.com/narcissus123/collabDev-backend](https://github.com/narcissus123/collabDev-backend)
-- GitHub repository - Frontend: [https://github.com/narcissus123/collabDev-frontend](https://github.com/narcissus123/collabDev-frontend)
+- [Frontend Repository](https://github.com/narcissus123/collabDev-frontend)
+- [Backend Repository](https://github.com/narcissus123/collabDev-backend)
 
+---
 
+<p align="center">
+  <sub>Built with ❤️ by developers, for developers</sub>
+</p>
