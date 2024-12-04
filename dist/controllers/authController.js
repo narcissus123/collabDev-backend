@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
@@ -27,7 +18,7 @@ const createSendToken = (user, statusCode, res) => {
         res.cookie("jwt", token, cookieOptions);
     }
     // Remove password from output
-    const userWithoutPassword = Object.assign(Object.assign({}, user.toObject()), { password: undefined });
+    const userWithoutPassword = { ...user.toObject(), password: undefined };
     res.status(statusCode).json({
         status: "success",
         token,
@@ -36,14 +27,14 @@ const createSendToken = (user, statusCode, res) => {
         }
     });
 };
-export const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const signup = async (req, res) => {
     try {
         if (!req.body.name || !req.body.email || !req.body.password) {
             return res.status(400).json({
                 message: "Please provide both email and password."
             });
         }
-        const newUser = yield User.create({
+        const newUser = await User.create({
             name: req.body.name,
             email: req.body.email,
             password: req.body.password
@@ -56,8 +47,8 @@ export const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         console.error("Error fetching user by ID:", err);
         res.status(500).json({ message: `Internal server error: ${err}` });
     }
-});
-export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -66,7 +57,7 @@ export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             });
         }
         // Check if user exists && password is correct
-        const user = yield User.findOne({ email }).select("+password");
+        const user = await User.findOne({ email }).select("+password");
         if (!user) {
             return res.status(401).json({
                 message: "Invalid email or password"
@@ -78,26 +69,26 @@ export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         console.error("Error fetching user by ID:", err);
         res.status(500).json({ message: `Internal server error: ${err}` });
     }
-});
-export const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const forgetPassword = async (req, res) => {
     const { email, newPassword } = req.body;
     try {
-        const user = yield User.findOne({ email });
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
         // Hash the new password
-        const hashedPassword = yield bcrypt.hash(newPassword, 10);
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
         // Update the user's password in the database
         user.password = hashedPassword;
-        yield user.save();
+        await user.save();
         return res.status(200).json({ message: "Password updated successfully" });
     }
     catch (error) {
         console.error("Error changing password:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
-});
+};
 // Custom promisify function for jwt.verify
 const verifyJwt = (token, secret) => new Promise((resolve, reject) => {
     jwt.verify(token, secret, (err, decoded) => {
@@ -108,7 +99,7 @@ const verifyJwt = (token, secret) => new Promise((resolve, reject) => {
     });
 });
 // Middleware to protect routes:
-export const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+export const protect = async (req, res, next) => {
     try {
         if (!process.env.JWT_SECRET) {
             throw new Error("JWT_SECRET is not set in environment variables");
@@ -125,9 +116,9 @@ export const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
                 });
             }
             // Verify token
-            const decoded = (yield verifyJwt(token, secret));
+            const decoded = (await verifyJwt(token, secret));
             // Check if user with the target token still exists
-            const currentUser = yield User.findById(decoded.id);
+            const currentUser = await User.findById(decoded.id);
             if (!currentUser) {
                 return res.status(401).json({
                     message: `The user belonging to this token does no longer exist.`
@@ -148,4 +139,4 @@ export const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
             message: `Internal server error: ${err.message}`
         });
     }
-});
+};

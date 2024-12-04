@@ -1,56 +1,46 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import User from "../models/userModel";
 import { deleteFromS3 } from "../middleware/s3Upload.middleware";
 import Project from "../models/projectModel";
 import Requests from "../models/requestModel";
 import { ChatMessage } from "../models/chatMessageModel";
-export const UpdateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+export const UpdateUser = async (req, res) => {
     try {
-        const userId = (_a = req.authenticatedUser) === null || _a === void 0 ? void 0 : _a.id;
+        const userId = req.authenticatedUser?.id;
         // Delete old resume if exists
-        const user = yield User.findById(userId);
+        const user = await User.findById(userId);
         if (!userId || userId !== req.params.userId) {
             return res.status(400).json({
                 status: 'error',
                 message: !userId ? "User not found. Please check the ID and try again." : "Unauthorized access."
             });
         }
-        if ((user === null || user === void 0 ? void 0 : user.resume) && req.body.resume !== undefined && req.body.resume !== user.resume) {
+        if (user?.resume && req.body.resume !== undefined && req.body.resume !== user.resume) {
             try {
-                yield deleteFromS3(user.resume);
+                await deleteFromS3(user.resume);
             }
             catch (deleteError) {
                 console.error("Error deleting old resume:", deleteError);
             }
         }
-        if ((user === null || user === void 0 ? void 0 : user.avatar) && req.body.avatar !== undefined && req.body.avatar !== user.avatar) {
+        if (user?.avatar && req.body.avatar !== undefined && req.body.avatar !== user.avatar) {
             try {
-                yield deleteFromS3(user.avatar);
+                await deleteFromS3(user.avatar);
             }
             catch (deleteError) {
                 console.error("Error deleting old avatar:", deleteError);
             }
         }
-        const updatedUser = yield User.findByIdAndUpdate(userId, { $set: req.body }, {
+        const updatedUser = await User.findByIdAndUpdate(userId, { $set: req.body }, {
             new: true
         });
         // Update all projects where this user is an owner
         if (req.body.name || req.body.avatar) {
             const updateData = {
-                name: req.body.name || (user === null || user === void 0 ? void 0 : user.name),
-                avatar: req.body.avatar || (user === null || user === void 0 ? void 0 : user.avatar)
+                name: req.body.name || user?.name,
+                avatar: req.body.avatar || user?.avatar
             };
             // Update Projects
-            yield Promise.all([
+            await Promise.all([
                 // Update projects where user is owner
                 Project.updateMany({ "owner._id": userId }, {
                     $set: {
@@ -104,10 +94,10 @@ export const UpdateUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
             message: "Unable to update user. Please try again later."
         });
     }
-});
-export const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const getAllUsers = async (req, res) => {
     try {
-        const users = yield User.find();
+        const users = await User.find();
         res.status(200).json({
             status: "success",
             results: users.length,
@@ -123,10 +113,10 @@ export const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, funct
             message: `Unable to retrieve users.`
         });
     }
-});
-export const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const getUserById = async (req, res) => {
     try {
-        const user = yield User.findById(req.params.userId);
+        const user = await User.findById(req.params.userId);
         if (!user) {
             return res
                 .status(404)
@@ -141,4 +131,4 @@ export const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, funct
             .status(500)
             .json({ message: "Unable to retrieve user information." });
     }
-});
+};

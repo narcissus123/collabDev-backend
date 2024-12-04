@@ -1,14 +1,5 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import dotenv from "dotenv";
-import app from "./app";
+import app from "./app.js";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
 dotenv.config({ path: "./.env" });
@@ -54,14 +45,14 @@ io.on("connection", (socket) => {
         const roomId = getChatRoom(JSON.stringify(prop.userId), JSON.stringify(prop.participantId));
         socket.join(roomId);
     });
-    socket.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
+    socket.on("message", async (message) => {
         try {
             const newMessage = new ChatMessage({
                 sender: message.sender,
                 receiver: message.receiver,
                 message: message.message
             });
-            yield newMessage.save();
+            await newMessage.save();
             const roomId = getChatRoom(JSON.stringify(message.sender._id), JSON.stringify(message.receiver._id));
             const receiverSocketId = userSocketMap.get(message.receiver._id.toString());
             io.to(roomId).emit("message", newMessage);
@@ -72,12 +63,11 @@ io.on("connection", (socket) => {
         catch (error) {
             console.error("Error saving message:", error);
         }
-    }));
-    socket.on("messageSeen", (_a) => __awaiter(void 0, [_a], void 0, function* ({ receiverId, senderId }) {
-        var _b;
+    });
+    socket.on("messageSeen", async ({ receiverId, senderId }) => {
         try {
             //find and update all messages that sender is x & receiver is Y & message is not seen
-            const updatedMessages = yield ChatMessage.updateMany({
+            const updatedMessages = await ChatMessage.updateMany({
                 "receiver._id": receiverId,
                 "sender._id": senderId,
                 seen: false
@@ -89,7 +79,7 @@ io.on("connection", (socket) => {
                 const receiverSocketId = userSocketMap.get(receiverId);
                 // Check if receiver is in the room
                 if (receiverSocketId &&
-                    ((_b = io.sockets.adapter.rooms.get(roomId)) === null || _b === void 0 ? void 0 : _b.has(receiverSocketId))) {
+                    io.sockets.adapter.rooms.get(roomId)?.has(receiverSocketId)) {
                     io.to(roomId).emit("messageSeen", updatedMessages);
                 }
                 else {
@@ -100,20 +90,19 @@ io.on("connection", (socket) => {
         catch (error) {
             console.error("Error updating message:", error);
         }
-    }));
-    socket.on("deleteMessage", (messageId) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b;
+    });
+    socket.on("deleteMessage", async (messageId) => {
         try {
-            const deletedMessage = yield ChatMessage.findByIdAndDelete(messageId);
+            const deletedMessage = await ChatMessage.findByIdAndDelete(messageId);
             if (deletedMessage) {
-                const roomId = getChatRoom(JSON.stringify((_a = deletedMessage === null || deletedMessage === void 0 ? void 0 : deletedMessage.sender) === null || _a === void 0 ? void 0 : _a._id), JSON.stringify((_b = deletedMessage === null || deletedMessage === void 0 ? void 0 : deletedMessage.receiver) === null || _b === void 0 ? void 0 : _b._id));
+                const roomId = getChatRoom(JSON.stringify(deletedMessage?.sender?._id), JSON.stringify(deletedMessage?.receiver?._id));
                 io.to(roomId).emit("messageDeleted", messageId);
             }
         }
         catch (error) {
             console.error("Error deleting message:", error);
         }
-    }));
+    });
     socket.on("disconnect", () => {
         console.log(`User ${socket.id} disconnected`);
         // Remove user from userSocketMap

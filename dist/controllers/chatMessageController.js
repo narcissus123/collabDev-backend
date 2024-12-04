@@ -1,18 +1,9 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { ChatMessage } from "../models/chatMessageModel";
 import mongoose from "mongoose";
-export const getUserChats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const getUserChats = async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.params.userId);
-        const conversations = yield ChatMessage.aggregate([
+        const conversations = await ChatMessage.aggregate([
             {
                 $match: {
                     $or: [{ "sender._id": userId }, { "receiver._id": userId }],
@@ -46,8 +37,8 @@ export const getUserChats = (req, res) => __awaiter(void 0, void 0, void 0, func
         const err = error;
         res.status(500).send(`Unable to get messages list: ${err}`);
     }
-});
-export const getUserChatById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const getUserChatById = async (req, res) => {
     try {
         const userId = req.params.userId;
         const participantId = req.params.participantId;
@@ -55,7 +46,7 @@ export const getUserChatById = (req, res) => __awaiter(void 0, void 0, void 0, f
         const pageNum = parseInt(page) || 1;
         const limitNum = parseInt(limit) || 10;
         const skip = (pageNum - 1) * limitNum;
-        const messages = yield ChatMessage.find({
+        const messages = await ChatMessage.find({
             $or: [
                 { "sender._id": userId, "receiver._id": participantId },
                 { "sender._id": participantId, "receiver._id": userId },
@@ -70,4 +61,4 @@ export const getUserChatById = (req, res) => __awaiter(void 0, void 0, void 0, f
         const err = error;
         res.status(500).send(`Unable to get message: ${err}`);
     }
-});
+};

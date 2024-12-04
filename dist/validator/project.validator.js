@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import joi from "joi";
 import Project from "../models/projectModel";
 const licenseOptions = [
@@ -48,9 +39,9 @@ const licenseOptions = [
     "zLib License"
 ];
 // Check if a project with the same title already exists
-const isUniqueTitle = (value, helpers) => __awaiter(void 0, void 0, void 0, function* () {
+const isUniqueTitle = async (value, helpers) => {
     try {
-        const existingProject = yield Project.findOne({ title: value });
+        const existingProject = await Project.findOne({ title: value });
         if (existingProject) {
             return helpers.error("any.custom");
         }
@@ -60,7 +51,7 @@ const isUniqueTitle = (value, helpers) => __awaiter(void 0, void 0, void 0, func
         const err = error;
         throw new Error(err.message);
     }
-});
+};
 const ownerSchema = joi.object({
     _id: joi.string().required(),
     name: joi.string().required(),
