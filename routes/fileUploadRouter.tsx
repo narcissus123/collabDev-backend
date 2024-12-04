@@ -1,7 +1,7 @@
 import { RequestHandler, Router } from "express";
-import * as authController from "../controllers/authController";
-import { uploadToS3 } from "../middleware/s3Upload.middleware";
-import * as fileUploadController from "../controllers/fileUploadController";
+import * as authController from "../controllers/authController.js";
+import { uploadToS3 } from "../middleware/s3Upload.middleware.js";
+import * as fileUploadController from "../controllers/fileUploadController.js";
 
 const router: Router = Router();
 router.route("/:userId/:fileType")

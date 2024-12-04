@@ -1,4 +1,4 @@
-import { ChatMessage } from "../models/chatMessageModel";
+import { ChatMessage } from "../models/chatMessageModel.js";
 import mongoose from "mongoose";
 export const getUserChats = async (req, res) => {
     try {

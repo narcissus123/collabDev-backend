@@ -1,9 +1,9 @@
 import { Router } from "express";
-import * as projectController from "../controllers/projectController";
-import * as authController from "../controllers/authController";
-import { userDataConvertor } from "../middleware/userDataConvertor.middleware";
-import { upload } from "../middleware/fileUpload.middleware";
-import { projectsValidator } from "../middleware/validateProject.middleware";
+import * as projectController from "../controllers/projectController.js";
+import * as authController from "../controllers/authController.js";
+import { userDataConvertor } from "../middleware/userDataConvertor.middleware.js";
+import { upload } from "../middleware/fileUpload.middleware.js";
+import { projectsValidator } from "../middleware/validateProject.middleware.js";
 
 const uploadProjectImages = upload.fields([
   { name: "coverImage", maxCount: 1 },

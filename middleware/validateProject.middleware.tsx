@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { schema } from "../validator/project.validator";
+import { schema } from "../validator/project.validator.js";
 
 // Middleware for validating project form input
 export const projectsValidator = (

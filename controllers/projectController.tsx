@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Project from "../models/projectModel";
+import Project from "../models/projectModel.js";
 import dayjs from "dayjs";
 import mongoose, { SortOrder } from "mongoose";
 

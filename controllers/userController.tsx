@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import User from "../models/userModel";
-import { deleteFromS3 } from "../middleware/s3Upload.middleware";
-import Project from "../models/projectModel";
-import Requests from "../models/requestModel";
-import { ChatMessage } from "../models/chatMessageModel";
+import User from "../models/userModel.js";
+import { deleteFromS3 } from "../middleware/s3Upload.middleware.js";
+import Project from "../models/projectModel.js";
+import Requests from "../models/requestModel.js";
+import { ChatMessage } from "../models/chatMessageModel.js";
 
 export const UpdateUser = async (req: Request, res: Response) => {
   try {

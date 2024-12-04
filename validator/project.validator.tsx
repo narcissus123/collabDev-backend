@@ -1,6 +1,6 @@
 import joi from "joi";
 import { ObjectSchema, CustomHelpers } from "joi";
-import Project from "../models/projectModel";
+import Project from "../models/projectModel.js";
 
 const licenseOptions = [
   "Academic Free License v3.0",
