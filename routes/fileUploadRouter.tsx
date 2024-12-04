@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import * as authController from "../controllers/authController";
 import { uploadToS3 } from "../middleware/s3Upload.middleware";
 import * as fileUploadController from "../controllers/fileUploadController";
@@ -13,7 +13,7 @@ router.route("/:userId/:fileType")
       { name: 'badges', maxCount: 10 },
       { name: 'resume', maxCount: 1 }
     ]),
-    fileUploadController.uploadFile
+    fileUploadController.uploadFile as RequestHandler
   )
   .delete(authController.protect, fileUploadController.deleteFile);
 

@@ -2,37 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
-import { Document, Types } from "mongoose";
-
-interface UserType extends Document {
-  _id: Types.ObjectId;
-  name: string;
-  email: string;
-  password: string;
-  avatar: string;
-  bio: string;
-  about: string;
-  role: "admin" | "user";
-  socialMedia: Map<string, string>;
-  preferredContact: string;
-  skills: string[];
-  languages: string[];
-  badges: string[];
-  availability?: {
-    status: "Available" | "Partially Available" | "Unavailable";
-    hoursPerDay: number;
-    daysPerWeek: number;
-  } | null;
-  passions: string[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-declare module "express" {
-  interface Request {
-    authenticatedUser: UserType;
-  }
-}
+import { Types } from "mongoose";
+import { UserDocument } from "../types/express.js";
 
 const signToken = (id: Types.ObjectId): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET as string, {
@@ -40,7 +11,7 @@ const signToken = (id: Types.ObjectId): string => {
   });
 };
 
-const createSendToken = (user: UserType, statusCode: number, res: Response) => {
+const createSendToken = (user: UserDocument, statusCode: number, res: Response) => {
   const token = signToken(user._id);
   const jwtCookieExpiresIn = process.env.JWT_COOKIE_EXPIRES_IN;
   if (jwtCookieExpiresIn) {
@@ -73,14 +44,15 @@ export const signup = async (req: Request, res: Response) => {
       });
     }
 
-    const newUser: UserType = await User.create({
+    const newUser = await User.create({
       name: req.body.name,
       email: req.body.email,
       password: req.body.password
     });
     if (newUser.availability !== null) {
-      createSendToken(newUser, 201, res);
+     createSendToken(newUser, 201, res);
     }
+    
   } catch (err) {
     console.error("Error fetching user by ID:", err);
     res.status(500).json({ message: `Internal server error: ${err}` });
@@ -99,7 +71,13 @@ export const login = async (req: Request, res: Response) => {
     // Check if user exists && password is correct
     const user = await User.findOne({ email }).select("+password");
 
-    createSendToken(user as UserType, 200, res);
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
+    }
+
+    createSendToken(user, 200, res);
   } catch (err) {
     console.error("Error fetching user by ID:", err);
     res.status(500).json({ message: `Internal server error: ${err}` });
@@ -181,7 +159,7 @@ export const protect = async (
       }
 
       // Give access to protected routes
-      req.authenticatedUser = currentUser as UserType;
+      req.authenticatedUser = currentUser;
       return next();
     }
 

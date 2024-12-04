@@ -23,7 +23,7 @@ export const uploadToS3 = multer({
     s3: s3Client,
     bucket: process.env.AWS_BUCKET_NAME!,
     acl: (req, file, cb) => {
-      const fileType = req?.params?.fileType; 
+      const fileType = (req as any).params?.fileType;
       if (fileType === "avatars" || fileType === "badges") {
         cb(null, "public-read"); 
       } else if (fileType === "resume") {
@@ -38,8 +38,8 @@ export const uploadToS3 = multer({
       cb(null, "attachment");
     },
     key: (req, file, cb) => {
-      const userId = req?.params?.userId; 
-      const fileType = req?.params?.fileType;
+      const userId = (req as any).params?.userId;
+      const fileType = (req as any).params?.fileType;
       if (!userId || !fileType) {
         console.error("Missing userId or fileType!");
         return cb(new Error("Missing userId or fileType!"), undefined);

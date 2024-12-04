@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
-const isJSON = (str: unknown) => {
+const isJSON = (str: unknown): boolean => {
+  if (typeof str !== 'string') return false;
+  
   try {
     JSON.parse(str);
     return true;

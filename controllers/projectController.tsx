@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Project from "../models/projectModel";
 import dayjs from "dayjs";
-import mongoose from "mongoose";
+import mongoose, { SortOrder } from "mongoose";
 
 export const updateProject = async (req: Request, res: Response) => {
   try {
@@ -178,7 +178,7 @@ export const getAllProjects = async (req: Request, res: Response) => {
       filter.location = { $regex: location as string, $options: "i" };
     }
 
-    const sort: { [key: string]: unknown } = {};
+    const sort: { [key: string]: SortOrder } = {};
     if (sortBy) {
       sort[sortBy as string] = sortOrder === "desc" ? -1 : 1;
     }

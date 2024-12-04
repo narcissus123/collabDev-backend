@@ -1,20 +1,21 @@
 import { Request, Response } from "express";
 import User from "../models/userModel";
+import { FileRequest } from "../types/express";
 import {
   deleteFromS3,
   getPresignedUrl
 } from "../middleware/s3Upload.middleware";
 
-interface MulterS3File extends Express.MulterS3.File {
-  key: string;
-  location: string;
-}
+// interface MulterS3File extends Express.MulterS3.File {
+//   key: string;
+//   location: string;
+// }
 
-interface FileRequest extends Request {
-  files: {
-    [fieldname: string]: MulterS3File[];
-  } | undefined;
-}
+// interface FileRequest extends Request {
+//   files: {
+//     [fieldname: string]: MulterS3File[];
+//   } | undefined;
+// }
 
 export const uploadFile = async (req: FileRequest, res: Response) => {
   let fileType: string | undefined; 
