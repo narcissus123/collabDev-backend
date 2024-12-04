@@ -1,5 +1,5 @@
-import Requests from "../models/requestModel";
-import { ChatMessage } from "../models/chatMessageModel";
+import Requests from "../models/requestModel.js";
+import { ChatMessage } from "../models/chatMessageModel.js";
 import mongoose from "mongoose";
 export const createRequest = async (req, res) => {
     try {

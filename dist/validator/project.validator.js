@@ -1,5 +1,5 @@
 import joi from "joi";
-import Project from "../models/projectModel";
+import Project from "../models/projectModel.js";
 const licenseOptions = [
     "Academic Free License v3.0",
     "Apache license 2.0",

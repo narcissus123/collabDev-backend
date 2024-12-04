@@ -1,4 +1,4 @@
-import { schema } from "../validator/project.validator";
+import { schema } from "../validator/project.validator.js";
 // Middleware for validating project form input
 export const projectsValidator = (req, res, next) => {
     const result = schema.validate(req.body, { abortEarly: false });

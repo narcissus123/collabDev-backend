@@ -1,13 +1,12 @@
 import express, { Express } from "express";
 import helmet from "helmet";
 import cors from "cors";
-import { config } from './config/environment';
-import authRouter from "./routes/authRoute";
-import userRouter from "./routes/userRoute";
-import fileUploadRouter from "./routes/fileUploadRouter";
-import projectRouter from "./routes/projectRoute";
-import requestRouter from "./routes/requestRoute";
-import chatMessageRouter from "./routes/chatMessageRoute";
+import authRouter from "./routes/authRoute.js";
+import userRouter from "./routes/userRoute.js";
+import fileUploadRouter from "./routes/fileUploadRouter.js";
+import projectRouter from "./routes/projectRoute.js";
+import requestRouter from "./routes/requestRoute.js";
+import chatMessageRouter from "./routes/chatMessageRoute.js";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
