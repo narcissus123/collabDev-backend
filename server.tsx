@@ -8,14 +8,17 @@ import { ChatMessage } from "./models/chatMessageModel";
 import { createServer } from "node:http";
 
 mongoose
-  .connect(config.mongoUri, {
+.connect(
+  process.env.DATABASE as string,
+  {
     useNewUrlParser: true
-  } as ConnectOptions)
-  .then(() => {
-    console.log("DB connection successful");
-  });
+  } as ConnectOptions
+)
+.then(() => {
+  console.log("DB connection successful");
+});
 
-const PORT = config.port;
+const PORT = process.env.PORT || 3000;
 const server = createServer(app);
 server.listen(PORT, (err?: Error) => {
   if (err) {
@@ -27,8 +30,10 @@ server.listen(PORT, (err?: Error) => {
 
 const io = new Server(server, {
   cors: {
-    origin: config.corsOrigins,
-    credentials: true
+    origin:
+      process.env.NODE_ENV === "production"
+        ? false
+        : ["http://localhost:3000", "http://127.0.0.1:3000"]
   }
 });
 
