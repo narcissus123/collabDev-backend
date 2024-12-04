@@ -23,11 +23,17 @@ export const userDataConvertor = (req, res, next) => {
                     });
                     if (updatedUserInput[fieldName]) {
                         // If updatedUserInput[fieldName] is not undefined
-                        updatedUserInput = Object.assign(Object.assign({}, updatedUserInput), { [fieldName]: [...filenames, ...updatedUserInput[fieldName]] });
+                        updatedUserInput = {
+                            ...updatedUserInput,
+                            [fieldName]: [...filenames, ...updatedUserInput[fieldName]]
+                        };
                     }
                     else {
                         // If updatedUserInput[fieldName] is undefined
-                        updatedUserInput = Object.assign(Object.assign({}, updatedUserInput), { [fieldName]: filenames });
+                        updatedUserInput = {
+                            ...updatedUserInput,
+                            [fieldName]: filenames
+                        };
                     }
                 }
             }
