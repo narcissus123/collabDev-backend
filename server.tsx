@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { config } from './config/environment';
 import app from "./app";
 import mongoose, { ConnectOptions } from "mongoose";
 import { Server } from "socket.io";
@@ -7,17 +8,14 @@ import { ChatMessage } from "./models/chatMessageModel";
 import { createServer } from "node:http";
 
 mongoose
-  .connect(
-    process.env.DATABASE as string,
-    {
-      useNewUrlParser: true
-    } as ConnectOptions
-  )
+  .connect(config.mongoUri, {
+    useNewUrlParser: true
+  } as ConnectOptions)
   .then(() => {
     console.log("DB connection successful");
   });
 
-const PORT = process.env.PORT || 3000;
+const PORT = config.port;
 const server = createServer(app);
 server.listen(PORT, (err?: Error) => {
   if (err) {
@@ -29,10 +27,8 @@ server.listen(PORT, (err?: Error) => {
 
 const io = new Server(server, {
   cors: {
-    origin:
-      process.env.NODE_ENV === "production"
-        ? false
-        : ["http://localhost:3000", "http://127.0.0.1:3000"]
+    origin: config.corsOrigins,
+    credentials: true
   }
 });
 
