@@ -4,7 +4,7 @@ import app from "./app.js";
 import mongoose, { ConnectOptions } from "mongoose";
 import { Server } from "socket.io";
 dotenv.config({ path: "./.env" });
-import { ChatMessage } from "./models/chatMessageModel";
+import { ChatMessage } from "./models/chatMessageModel.js";
 import { createServer } from "node:http";
 
 mongoose
