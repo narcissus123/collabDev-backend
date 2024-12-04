@@ -3,7 +3,7 @@ import app from "./app.js";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
 dotenv.config({ path: "./.env" });
-import { ChatMessage } from "./models/chatMessageModel";
+import { ChatMessage } from "./models/chatMessageModel.js";
 import { createServer } from "node:http";
 mongoose
     .connect(process.env.DATABASE, {
