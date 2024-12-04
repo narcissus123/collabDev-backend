@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node dist/server.js",
-    "dev": "nodemon --exec tsx server.tsx",
+    "dev": "nodemon --exec tsx server.ts",
     "build": "tsc",
     "lint": "eslint . --fix"
   },
