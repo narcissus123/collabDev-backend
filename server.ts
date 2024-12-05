@@ -29,10 +29,9 @@ server.listen(PORT, (err?: Error) => {
 
 const io = new Server(server, {
   cors: {
-    origin:
-      process.env.NODE_ENV === "production"
-        ? false
-        : ["http://localhost:3000", "http://127.0.0.1:3000"]
+    origin: process.env.NODE_ENV === "production"
+      ? "https://collab-dev-frontend-l5kxjzkjk-narges-hearis-projects.vercel.app"
+      : ["http://localhost:3000", "http://127.0.0.1:3000"]
   }
 });
 
@@ -101,7 +100,10 @@ io.on("connection", (socket) => {
         {
           $set: { seen: true }
         },
-        { new: true }
+        { 
+          new: true,
+          timestamps: false
+         }
       );
 
       if (updatedMessages) {

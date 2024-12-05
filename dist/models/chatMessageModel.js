@@ -32,5 +32,10 @@ const chatMessageSchema = new mongoose.Schema({
     },
     message: { type: String, required: true },
     seen: { type: Boolean, required: true, default: false }
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    skipVersioning: {
+        seen: true
+    }
+});
 export const ChatMessage = mongoose.model("ChatMessage", chatMessageSchema);

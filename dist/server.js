@@ -24,7 +24,7 @@ server.listen(PORT, (err) => {
 const io = new Server(server, {
     cors: {
         origin: process.env.NODE_ENV === "production"
-            ? false
+            ? "https://collab-dev-frontend-l5kxjzkjk-narges-hearis-projects.vercel.app"
             : ["http://localhost:3000", "http://127.0.0.1:3000"]
     }
 });
@@ -73,7 +73,10 @@ io.on("connection", (socket) => {
                 seen: false
             }, {
                 $set: { seen: true }
-            }, { new: true });
+            }, {
+                new: true,
+                timestamps: false
+            });
             if (updatedMessages) {
                 const roomId = getChatRoom(JSON.stringify(senderId), JSON.stringify(receiverId));
                 const receiverSocketId = userSocketMap.get(receiverId);
