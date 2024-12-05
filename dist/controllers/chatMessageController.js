@@ -10,7 +10,7 @@ export const getUserChats = async (req, res) => {
                 },
             },
             {
-                $sort: { updatedAt: -1 },
+                $sort: { createdAt: -1 },
             },
             {
                 $group: {

@@ -12,18 +12,10 @@ import { dirname, join } from "path";
 
 const app: Express = express();
 
-// app.use(
-//   cors({
-//     origin: ["http://localhost:3000", "http://127.0.0.1:3000"]
-//   })
-// );
-
-app.use(cors({ 
-  origin: [
-    "http://localhost:3000", 
-    "http://127.0.0.1:3000",
-    "https://collab-dev-a4e625b74962.herokuapp.com"
-  ] 
+app.use(cors({
+  origin: process.env.NODE_ENV === "production" 
+    ? "https://collab-dev-frontend-l5kxjzkjk-narges-hearis-projects.vercel.app"
+    : ["http://localhost:3000", "http://127.0.0.1:3000"]
 }));
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));

@@ -4,6 +4,8 @@
 [![Express](https://img.shields.io/badge/Express-4.18.2-green.svg)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-5.0.0-green.svg)](https://www.mongodb.com/)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4.6.1-black.svg)](https://socket.io/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployment-black.svg)](https://vercel.com/)
+[![Heroku](https://img.shields.io/badge/Heroku-Deployment-purple.svg)](https://heroku.com/)
 
 CollabDev is an innovative platform that transforms how developers connect and collaborate on projects. Whether you're passionate about coding and want to join exciting projects, or you're looking for talented developers to bring your ideas to life, CollabDev provides the perfect environment for meaningful collaboration. Our platform emphasizes real-world project experience and genuine connections in the development community.
 
@@ -68,6 +70,9 @@ _This is just the beginning - many more features are in our development pipeline
 - **Code Quality**: ESLint
 - **Development Server**: Nodemon
 
+### Deployment
+- **Backend**: Heroku
+- **Frontend**: Vercel
 
 ## 🚦 Getting Started
 
@@ -77,7 +82,7 @@ _This is just the beginning - many more features are in our development pipeline
 - npm/yarn
 - AWS Account (for S3 storage)
 
-### Installation
+### Backend Installation
 
 1. Clone the repository
 ```bash
@@ -99,6 +104,30 @@ cp .env.example .env
 4. Start development server
 ```bash
 npm run dev
+```
+
+### Frontend Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/narcissus123/collabDev-frontend.git
+cd collabDev-frontend
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Configure environment variables
+```bash
+cp .env.example .env
+# Edit .env with your configurations
+```
+
+4. Start React
+```bash
+npm start
 ```
 
 ## 🔗 Links
