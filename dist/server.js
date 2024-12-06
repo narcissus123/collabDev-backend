@@ -24,7 +24,7 @@ server.listen(PORT, (err) => {
 const io = new Server(server, {
     cors: {
         origin: process.env.NODE_ENV === "production"
-            ? "https://collab-dev-frontend-l5kxjzkjk-narges-hearis-projects.vercel.app"
+            ? "https://collab-dev.vercel.app"
             : ["http://localhost:3000", "http://127.0.0.1:3000"]
     }
 });
