@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 import { ChatMessage } from "./models/chatMessageModel.js";
 import { createServer } from "node:http";
+import { updateMongoIPWhitelist } from './utils/mongoIPManager';
 console.log('Current NODE_ENV:', process.env.NODE_ENV);
 console.log('Loading config from:', process.env.NODE_ENV === 'production' ? '.env.production' : '.env');
 dotenv.config({
@@ -12,7 +13,15 @@ dotenv.config({
         : '.env'
 });
 console.log('Database URL being used:', process.env.DATABASE?.substring(0, 20) + '...');
-
+if (process.env.NODE_ENV === 'production') {
+    try {
+        await updateMongoIPWhitelist();
+        console.log('Successfully updated MongoDB IP whitelist');
+    }
+    catch (error) {
+        console.error('Failed to update IP whitelist:', error);
+    }
+}
 const connectWithRetry = async () => {
     try {
         await mongoose.connect(process.env.DATABASE, {
