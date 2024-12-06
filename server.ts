@@ -2,15 +2,21 @@ import dotenv from "dotenv";
 import app from "./app.js";
 import mongoose, { ConnectOptions } from "mongoose";
 import { Server } from "socket.io";
-dotenv.config({ path: "./.env" });
 import { ChatMessage } from "./models/chatMessageModel.js";
 import { createServer } from "node:http";
+
+dotenv.config({ 
+  path: process.env.NODE_ENV === 'production' 
+    ? '.env.production' 
+    : '.env' 
+});
 
 mongoose
 .connect(
   process.env.DATABASE as string,
   {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    tls: true
   } as ConnectOptions
 )
 .then(() => {
