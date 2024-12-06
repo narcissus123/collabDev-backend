@@ -4,7 +4,7 @@ import mongoose, { ConnectOptions } from "mongoose";
 import { Server } from "socket.io";
 import { ChatMessage } from "./models/chatMessageModel.js";
 import { createServer } from "node:http";
-import { updateMongoIPWhitelist } from './utils/mongoIPManager';
+import { updateMongoIPWhitelist } from './utils/mongoIPManager.js';
 
 console.log('Current NODE_ENV:', process.env.NODE_ENV);
 
