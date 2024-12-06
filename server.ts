@@ -2,19 +2,34 @@ import dotenv from "dotenv";
 import app from "./app.js";
 import mongoose, { ConnectOptions } from "mongoose";
 import { Server } from "socket.io";
-dotenv.config({ path: "./.env" });
 import { ChatMessage } from "./models/chatMessageModel.js";
 import { createServer } from "node:http";
+
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
+
+console.log('Loading config from:', process.env.NODE_ENV === 'production' ? '.env.production' : '.env');
+
+dotenv.config({ 
+  path: process.env.NODE_ENV === 'production' 
+    ? '.env.production' 
+    : '.env' 
+});
+
+console.log('Database URL being used:', process.env.DATABASE?.substring(0, 20) + '...'); 
 
 mongoose
 .connect(
   process.env.DATABASE as string,
   {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    tls: true
   } as ConnectOptions
 )
 .then(() => {
   console.log("DB connection successful");
+}).catch(error => {
+  console.error('Database connection error:', error.message);
+  console.error('Full error:', error);
 });
 
 const PORT = process.env.PORT || 3000;
