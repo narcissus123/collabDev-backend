@@ -19,24 +19,21 @@ export const updateMongoIPWhitelist = async () => {
     }
 
     // Adding IP to whitelist
-    await axios.post(
-      atlasApiUrl,
-      {
-        ipAddress: currentIP,
-        comment: `Heroku Dyno IP - Updated ${new Date().toISOString()}`
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+    const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Basic ${Buffer.from(ATLAS_API_KEY + ':').toString('base64')}`
+      };
+      
+      await axios.post(
+        atlasApiUrl,
+        {
+          ipAddress: currentIP,
+          comment: `Heroku Dyno IP - Updated ${new Date().toISOString()}`
         },
-        auth: {
-          username: ATLAS_API_KEY,
-          password: ''
-        }
-      }
-    );
-
+        { headers }
+      );
+    
     console.log(`Successfully whitelisted IP: ${currentIP}`);
   } catch (error) {
     console.error('Failed to update MongoDB IP whitelist:', error);

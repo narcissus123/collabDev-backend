@@ -26,6 +26,7 @@ const connectWithRetry = async () => {
     try {
         await mongoose.connect(process.env.DATABASE, {
             useNewUrlParser: true,
+            useUnifiedTopology: true,
             tls: true,
             serverSelectionTimeoutMS: 30000,
             connectTimeoutMS: 30000,

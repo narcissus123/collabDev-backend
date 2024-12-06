@@ -14,19 +14,15 @@ export const updateMongoIPWhitelist = async () => {
             throw new Error('ATLAS_API_KEY is not defined');
         }
         // Adding IP to whitelist
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Basic ${Buffer.from(ATLAS_API_KEY + ':').toString('base64')}`
+        };
         await axios.post(atlasApiUrl, {
             ipAddress: currentIP,
             comment: `Heroku Dyno IP - Updated ${new Date().toISOString()}`
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            auth: {
-                username: ATLAS_API_KEY,
-                password: ''
-            }
-        });
+        }, { headers });
         console.log(`Successfully whitelisted IP: ${currentIP}`);
     }
     catch (error) {
