@@ -17,20 +17,32 @@ dotenv.config({
 
 console.log('Database URL being used:', process.env.DATABASE?.substring(0, 20) + '...'); 
 
-mongoose
-.connect(
-  process.env.DATABASE as string,
-  {
-    useNewUrlParser: true,
-    tls: true
-  } as ConnectOptions
-)
-.then(() => {
-  console.log("DB connection successful");
-}).catch(error => {
-  console.error('Database connection error:', error.message);
-  console.error('Full error:', error);
-});
+const connectWithRetry = async () => {
+  try {
+    await mongoose.connect(process.env.DATABASE as string, {
+      useNewUrlParser: true,
+      tls: true,
+      serverSelectionTimeoutMS: 30000,    
+      connectTimeoutMS: 30000,           
+      socketTimeoutMS: 45000,            
+      maxPoolSize: 50,                  
+      minPoolSize: 10,                   
+      retryWrites: true,
+      w: 'majority',                      
+      maxIdleTimeMS: 60000                
+    } as ConnectOptions);
+
+console.log("DB connection successful");
+} catch (error) {
+  console.error('Database connection error:', error);
+  // Retry after 5 seconds
+  setTimeout(connectWithRetry, 5000);
+}
+};
+
+
+// Initial connection
+connectWithRetry();
 
 const PORT = process.env.PORT || 3000;
 const server = createServer(app);
