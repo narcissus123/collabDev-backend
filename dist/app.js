@@ -12,8 +12,13 @@ import { dirname, join } from "path";
 const app = express();
 app.use(cors({
     origin: process.env.NODE_ENV === "production"
-        ? "https://collab-dev.vercel.app"
-        : ["http://localhost:3000", "http://127.0.0.1:3000"]
+        ? [
+            "https://collab-dev.vercel.app",
+            "https://collab-dev-git-feature-img-narges-hearis-projects.vercel.app"
+        ]
+        : ["http://localhost:3000", "http://127.0.0.1:3000"],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 }));
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(express.json());
