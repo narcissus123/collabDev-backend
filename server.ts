@@ -8,7 +8,7 @@ import { updateMongoIPWhitelist } from './utils/mongoIPManager';
 
 console.log('Current NODE_ENV:', process.env.NODE_ENV);
 
-console.log('Loading config from:', process.env.NODE_ENV === 'production' ? '.env.production' : '.env');
+console.log('Loading config from here:', process.env.NODE_ENV === 'production' ? '.env.production' : '.env');
 
 dotenv.config({ 
   path: process.env.NODE_ENV === 'production' 
