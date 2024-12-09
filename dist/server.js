@@ -91,6 +91,7 @@ io.on("connection", (socket) => {
                 message: message.message
             });
             await newMessage.save();
+            console.log('Message saved successfully');
             const roomId = getChatRoom(JSON.stringify(message.sender._id), JSON.stringify(message.receiver._id));
             const receiverSocketId = userSocketMap.get(message.receiver._id.toString());
             io.to(roomId).emit("message", newMessage);

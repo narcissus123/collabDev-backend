@@ -91,6 +91,11 @@ export const schema: ObjectSchema = joi.object({
     "string.empty": "Title cannot be empty.",
     "any.custom": "Project name must be unique."
   }),
+  logoStyle: joi.number().min(0).max(3).default(0).messages({
+    "number.base": "Logo style must be a number",
+    "number.min": "Logo style must be between 0 and 3",
+    "number.max": "Logo style must be between 0 and 3"
+  }),
   description: joi.string().required().messages({
     "any.required": "Description is required.",
     "string.empty": "Description cannot be empty."
@@ -157,9 +162,15 @@ export const schema: ObjectSchema = joi.object({
   likes: joi.number().min(0).messages({
     "number.min": "Likes must be a non-negative number."
   }),
-  links: joi.array().items(joi.string()).required().messages({
+  links: joi.array().items(
+    joi.object({
+      platform: joi.string().required(),
+      url: joi.string().required()
+    })
+  ).required().messages({
     "any.required": "Links are required.",
-    "array.includesRequiredUnknowns": "Links must be an array of strings."
+    "array.base": "Links must be an array of objects with platform and url.",
+    "array.includesRequiredUnknowns": "Each link must have a platform and url."
   }),
   coverImage: joi.array().items(joi.string()).messages({
     "array.includesRequiredUnknowns": "Cover image must be an array of strings."

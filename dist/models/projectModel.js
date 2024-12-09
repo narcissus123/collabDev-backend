@@ -22,6 +22,10 @@ const projectSchema = new mongoose.Schema({
         unique: true,
         uniqueErrorMessage: "The project with this title already exists."
     },
+    logoStyle: {
+        type: Number,
+        default: 0,
+    },
     description: {
         type: String,
         required: true
@@ -125,7 +129,16 @@ const projectSchema = new mongoose.Schema({
         default: 0
     },
     links: {
-        type: [String],
+        type: [{
+                platform: {
+                    type: String,
+                    required: true
+                },
+                url: {
+                    type: String,
+                    required: true
+                }
+            }],
         required: true
     },
     coverImage: [String],
