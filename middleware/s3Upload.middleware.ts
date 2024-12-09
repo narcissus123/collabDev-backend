@@ -23,7 +23,9 @@ export const uploadToS3 = multer({
     s3: s3Client,
     bucket: process.env.AWS_BUCKET_NAME!,
     acl: (req, file, cb) => {
+      console.log("process.env.AWS_BUCKET_NAME", process.env.AWS_BUCKET_NAME);
       const fileType = (req as any).params?.fileType;
+      console.log("fileType", fileType);
       if (fileType === "avatars" || fileType === "badges") {
         cb(null, "public-read"); 
       } else if (fileType === "resume") {
@@ -44,7 +46,9 @@ export const uploadToS3 = multer({
         console.error("Missing userId or fileType!");
         return cb(new Error("Missing userId or fileType!"), undefined);
       }
+      
       const fileName = `${fileType}/user-${userId}-${Date.now()}-${file.originalname}`;
+      console.log("fileName", fileName);
       cb(null, fileName);
     },
   })
