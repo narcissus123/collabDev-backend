@@ -11,7 +11,9 @@ router.route("/:userId/:fileType")
     uploadToS3.fields([
       { name: 'avatars', maxCount: 1 },
       { name: 'badges', maxCount: 10 },
-      { name: 'resume', maxCount: 1 }
+      { name: 'resume', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
+      { name: 'screenshots', maxCount: 10 },
     ]),
     fileUploadController.uploadFile as RequestHandler
   )

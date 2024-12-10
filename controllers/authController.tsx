@@ -177,7 +177,7 @@ export const protect = async (
 
       if (!currentUser) {
         return res.status(401).json({
-          message: `The user belonging to this token does no longer exist.`
+          message: `User not found.`
         });
       }
 

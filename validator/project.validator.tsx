@@ -172,8 +172,8 @@ export const schema: ObjectSchema = joi.object({
     "array.base": "Links must be an array of objects with platform and url.",
     "array.includesRequiredUnknowns": "Each link must have a platform and url."
   }),
-  coverImage: joi.array().items(joi.string()).messages({
-    "array.includesRequiredUnknowns": "Cover image must be an array of strings."
+  coverImage: joi.string().messages({
+    "array.includesRequiredUnknowns": "Cover image must be a string."
   }),
   screenshots: joi.array().items(joi.string()).messages({
     "array.includesRequiredUnknowns": "Screenshots must be an array of strings."
