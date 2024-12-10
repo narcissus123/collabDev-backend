@@ -146,9 +146,11 @@ const projectSchema = new mongoose.Schema({
     }],
     required: true
   },
-  coverImage: [String],
+  coverImage: {
+    type: String,
+    default: ""
+  },
   screenshots: [String],
-
   sitemap: [String],
   userStories: {
     type: [String],

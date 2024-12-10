@@ -8,10 +8,10 @@ export const UpdateUser = async (req, res) => {
         const userId = req.authenticatedUser?.id;
         // Delete old resume if exists
         const user = await User.findById(userId);
-        if (!userId || userId !== req.params.userId) {
+        if (userId !== req.params.userId) {
             return res.status(400).json({
                 status: 'error',
-                message: !userId ? "User not found. Please check the ID and try again." : "Unauthorized access."
+                message: "Unauthorized access."
             });
         }
         if (user?.resume && req.body.resume !== undefined && req.body.resume !== user.resume) {

@@ -26,7 +26,7 @@ export const uploadToS3 = multer({
       console.log("process.env.AWS_BUCKET_NAME", process.env.AWS_BUCKET_NAME);
       const fileType = (req as any).params?.fileType;
       console.log("fileType", fileType);
-      if (fileType === "avatars" || fileType === "badges") {
+      if (fileType === "avatars" || fileType === "badges" || fileType === "coverImage" || fileType === "screenshots") {
         cb(null, "public-read"); 
       } else if (fileType === "resume") {
         cb(null, "private"); 
