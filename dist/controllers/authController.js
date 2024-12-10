@@ -31,7 +31,7 @@ export const signup = async (req, res) => {
     try {
         if (!req.body.name || !req.body.email || !req.body.password) {
             return res.status(400).json({
-                message: "Please provide both email and password."
+                message: "Please provide name, email and password."
             });
         }
         const newUser = await User.create({
@@ -43,15 +43,26 @@ export const signup = async (req, res) => {
             createSendToken(newUser, 201, res);
         }
     }
-    catch (err) {
-        console.error("Error fetching user by ID:", err);
-        res.status(500).json({ message: `Internal server error: ${err}` });
+    catch (error) {
+        // Check if it's a MongoDB duplicate key error
+        if (error.name === 'MongoServerError' && error.code === 11000) {
+            return res.status(409).json({
+                status: 'fail',
+                message: "An account with this email already exists."
+            });
+        }
+        console.error("Error in signup:", error);
+        return res.status(500).json({
+            status: 'error',
+            message: "Unable to create account. Please try again later."
+        });
     }
 };
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
+            console.log("Missing email or password");
             return res.status(400).json({
                 message: "Please provide email and password!"
             });
@@ -63,10 +74,17 @@ export const login = async (req, res) => {
                 message: "Invalid email or password"
             });
         }
+        const storedPassword = user.password;
+        const isPasswordValid = await bcrypt.compare(password, storedPassword);
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
         createSendToken(user, 200, res);
     }
     catch (err) {
-        console.error("Error fetching user by ID:", err);
+        console.error("Error in login process:", err);
         res.status(500).json({ message: `Internal server error: ${err}` });
     }
 };
