@@ -6,8 +6,8 @@ export const updateProject = async (req, res) => {
     try {
         const userId = req.authenticatedUser?.id;
         // Delete old cover image if exists
-        const project = await Project.findById(userId);
-        if (userId !== req.params.userId) {
+        const project = await Project.findById(req.params.projectId);
+        if (!project?.owner?._id || project.owner._id.toString() !== userId?.toString()) {
             return res.status(400).json({
                 status: 'error',
                 message: "Unauthorized access."
