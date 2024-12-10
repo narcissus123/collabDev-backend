@@ -1,8 +1,26 @@
 import Project from "../models/projectModel.js";
 import dayjs from "dayjs";
 import mongoose from "mongoose";
+import { deleteFromS3 } from "../middleware/s3Upload.middleware.js";
 export const updateProject = async (req, res) => {
     try {
+        const userId = req.authenticatedUser?.id;
+        // Delete old cover image if exists
+        const project = await Project.findById(userId);
+        if (userId !== req.params.userId) {
+            return res.status(400).json({
+                status: 'error',
+                message: "Unauthorized access."
+            });
+        }
+        if (project?.coverImage && req.body.coverImage !== undefined && req.body.coverImage !== project.coverImage) {
+            try {
+                await deleteFromS3(project.coverImage);
+            }
+            catch (deleteError) {
+                console.error("Error deleting old cover image:", deleteError);
+            }
+        }
         const updatedProject = await Project.findByIdAndUpdate(req.params.projectId, req.body, {
             new: true
         });
@@ -193,6 +211,29 @@ export const deleteProject = async (req, res) => {
             return res.status(400).json({
                 error: "Cannot delete project with active contributors."
             });
+        }
+        // Delete cover image from S3 if it exists
+        if (project.coverImage) {
+            try {
+                await deleteFromS3(project.coverImage);
+            }
+            catch (error) {
+                console.error('Error deleting cover image:', error);
+                // Continue with deletion even if image deletion fails
+            }
+        }
+        // Delete all screenshots from S3 if they exist
+        if (project.screenshots && project.screenshots.length > 0) {
+            const deletePromises = project.screenshots.map(async (screenshot) => {
+                try {
+                    await deleteFromS3(screenshot);
+                }
+                catch (error) {
+                    console.error(`Error deleting screenshot ${screenshot}:`, error);
+                    // Continue with deletion even if image deletion fails
+                }
+            });
+            await Promise.all(deletePromises);
         }
         // Delete the project
         await Project.findByIdAndDelete(projectId);

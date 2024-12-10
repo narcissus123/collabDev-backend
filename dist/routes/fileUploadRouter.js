@@ -8,7 +8,9 @@ router.route("/:userId/:fileType")
     .post(authController.protect, uploadToS3.fields([
     { name: 'avatars', maxCount: 1 },
     { name: 'badges', maxCount: 10 },
-    { name: 'resume', maxCount: 1 }
+    { name: 'resume', maxCount: 1 },
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'screenshots', maxCount: 10 },
 ]), fileUploadController.uploadFile)
     .delete(authController.protect, fileUploadController.deleteFile);
 export default router;
