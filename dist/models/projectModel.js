@@ -50,7 +50,7 @@ const projectSchema = new mongoose.Schema({
         },
         avatar: {
             type: String,
-            required: true
+            required: false
         }
     },
     contributors: [
@@ -59,8 +59,14 @@ const projectSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User"
             },
-            name: String,
-            avatar: String
+            name: {
+                type: String,
+                required: true
+            },
+            avatar: {
+                type: String,
+                required: false
+            }
         }
     ],
     roles: [
