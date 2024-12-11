@@ -55,7 +55,7 @@ const isUniqueTitle = async (value, helpers) => {
 const ownerSchema = joi.object({
     _id: joi.string().required(),
     name: joi.string().required(),
-    avatar: joi.string().required()
+    avatar: joi.string()
 });
 const contributorsSchema = joi.object({
     _id: joi.string(),
@@ -78,7 +78,7 @@ const techStackSchema = joi.object({
 });
 export const schema = joi.object({
     title: joi.string().required().custom(isUniqueTitle).messages({
-        "any.required": "Title is required!!!!",
+        "any.required": "Title is required!",
         "string.empty": "Title cannot be empty.",
         "any.custom": "Project name must be unique."
     }),
