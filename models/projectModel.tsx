@@ -120,8 +120,8 @@ const projectSchema = new mongoose.Schema({
   },
   license: {
     type: String,
-    required: true,
-    default: "MIT"
+    required: false,
+    default: ""
   },
   startDate: {
     type: Date,

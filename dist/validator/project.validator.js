@@ -1,6 +1,7 @@
 import joi from "joi";
 import Project from "../models/projectModel.js";
 const licenseOptions = [
+    "",
     "Academic Free License v3.0",
     "Apache license 2.0",
     "Artistic license 2.0",
@@ -55,12 +56,12 @@ const isUniqueTitle = async (value, helpers) => {
 const ownerSchema = joi.object({
     _id: joi.string().required(),
     name: joi.string().required(),
-    avatar: joi.string()
+    avatar: joi.string().allow("")
 });
 const contributorsSchema = joi.object({
     _id: joi.string(),
     name: joi.string(),
-    avatar: joi.string()
+    avatar: joi.string().allow("")
 });
 const endpointSchema = joi.object({
     method: joi.string(),
@@ -123,9 +124,10 @@ export const schema = joi.object({
     license: joi
         .string()
         .valid(...licenseOptions)
-        .required()
+        .allow(null, "")
         .messages({
-        "any.required": "License is required."
+        "string.base": "License must be a string",
+        "any.only": "Please select a valid license"
     }),
     startDate: joi.date().required().messages({
         "any.required": "Start date is required."

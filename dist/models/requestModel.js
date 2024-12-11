@@ -12,7 +12,7 @@ const requestSchema = new mongoose.Schema({
         },
         avatar: {
             type: String,
-            required: true
+            required: false
         }
     },
     contributor: {
@@ -27,7 +27,7 @@ const requestSchema = new mongoose.Schema({
         },
         avatar: {
             type: String,
-            required: true
+            required: false
         }
     },
     messageType: {
