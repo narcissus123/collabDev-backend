@@ -3,6 +3,42 @@ import { deleteFromS3 } from "../middleware/s3Upload.middleware.js";
 import Project from "../models/projectModel.js";
 import Requests from "../models/requestModel.js";
 import { ChatMessage } from "../models/chatMessageModel.js";
+export const searchUsers = async (req, res) => {
+    try {
+        const searchQuery = req.query.q;
+        if (!searchQuery) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Search query is required'
+            });
+        }
+        // Split the search query into words and create a regex pattern for each word
+        const searchWords = searchQuery.trim().split(/\s+/);
+        const regexPattern = searchWords.map(word => `(?=.*${word})` // Positive lookahead for each word
+        ).join('');
+        const users = await User.find({
+            name: {
+                $regex: regexPattern,
+                $options: 'i'
+            }
+        })
+            .select('name avatar email')
+            .limit(10);
+        return res.status(200).json({
+            status: 'success',
+            data: {
+                users
+            }
+        });
+    }
+    catch (error) {
+        console.error("Search error:", error);
+        return res.status(500).json({
+            status: 'error',
+            message: "An error occurred while searching users"
+        });
+    }
+};
 export const UpdateUser = async (req, res) => {
     try {
         const userId = req.authenticatedUser?.id;

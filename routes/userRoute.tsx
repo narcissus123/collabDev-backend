@@ -4,6 +4,10 @@ import * as authController from "../controllers/authController.js";
 
 const router: Router = Router();
 router.route("/").get(userController.getAllUsers);
+
+router.route("/search")
+  .get(userController.searchUsers);
+  
 router
   .route("/:userId")
   .get(userController.getUserById)
